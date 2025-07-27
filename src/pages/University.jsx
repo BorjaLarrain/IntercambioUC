@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import supabase from "../config/supabaseClient";
 import RatingBar from "../components/RatingBar";
 import { useParams, useNavigate } from "react-router-dom";
+import Modal from "../components/Modal";
+import ReviewForm from "../components/ReviewForm";
+import { UserAuth } from "../context/AuthContext";
 
 export default function University() {
     const { id } = useParams();
@@ -10,6 +13,10 @@ export default function University() {
     const [university, setUniversity] = useState(null);
     const [reviews, setReviews] = useState([]);
     const [fetchError, setFetchError] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [message, setMessage] = useState("");
+    const { session } = UserAuth();
+    const user = session?.user;
 
     useEffect(() => {
         const fetchUniversity = async () => {
@@ -43,7 +50,6 @@ export default function University() {
                 console.log(error.message)
                 setReviews([]);
                 navigate('/');
-
             } else {
                 setReviews(data);
                 setFetchError(null);
@@ -52,95 +58,93 @@ export default function University() {
 
         fetchUniversity();
         fetchReviews();
-
     }, [id, navigate]);
-    
-    // // Función que calcula el rating global de la universidad
-    // const calcularRatingGlobal = () => {
-    //     if (!reviews || reviews.length === 0) return null;
 
-    //     // bueas
-    //     const ratings = reviews
-    //         .map(r => typeof r.global_rating === 'number' ? r.global_rating : parseFloat(r.global_rating))
-
-    //     // Se obtiene suma total
-    //     const sum = ratings.reduce((acc, curr) => acc + curr, 0);
-
-    //     // Se calcula y retorna el promedio
-    //     return sum / ratings.length;
-    // };
-
-    // Función que calcula el rating de la movilidad de la universidad
+    // FUNCIONES DE CÁLCULO DE RATINGS (de university_and_home_pages)
     const calcularRatingMovilidad = () => {
         if (!reviews || reviews.length === 0) return null;
-
-        // bueas
         const ratings = reviews
             .map(r => typeof r.connectivity_rating === 'number' ? r.connectivity_rating : parseFloat(r.connectivity_rating))
-
-        // Se obtiene suma total
         const sum = ratings.reduce((acc, curr) => acc + curr, 0);
-
-        // Se calcula y retorna el promedio
         return sum / ratings.length;
     };
 
-    // Función que calcula el rating del Costo de Vida de la universidad
     const calcularRatingCostoDeVida = () => {
         if (!reviews || reviews.length === 0) return null;
-
-        // bueas
         const ratings = reviews
             .map(r => typeof r.cost_of_living_rating === 'number' ? r.cost_of_living_rating : parseFloat(r.cost_of_living_rating))
-
-        // Se obtiene suma total
         const sum = ratings.reduce((acc, curr) => acc + curr, 0);
-
-        // Se calcula y retorna el promedio
         return sum / ratings.length;
     };
 
-    // Función que calcula el rating del Housing de la universidad
     const calcularRatingHousing = () => {
         if (!reviews || reviews.length === 0) return null;
-
-        // bueas
         const ratings = reviews
             .map(r => typeof r.housing_rating === 'number' ? r.housing_rating : parseFloat(r.housing_rating))
-
-        // Se obtiene suma total
         const sum = ratings.reduce((acc, curr) => acc + curr, 0);
-
-        // Se calcula y retorna el promedio
         return sum / ratings.length;
     };
 
-    // Función que calcula el rating de la Calidad de Vida de la universidad
     const calcularRatingCalidadDeVida = () => {
         if (!reviews || reviews.length === 0) return null;
-
-        // bueas
         const ratings = reviews
             .map(r => typeof r.social_life_rating === 'number' ? r.social_life_rating : parseFloat(r.social_life_rating))
-
-        // Se obtiene suma total
         const sum = ratings.reduce((acc, curr) => acc + curr, 0);
-
-        // Se calcula y retorna el promedio
         return sum / ratings.length;
     };
 
-    // Función que calcula el rating global de la universidad (a partir del promedio de los ratings de las diversas categorías)
     const calcularRatingGlobal = () => {
         if (!reviews || reviews.length === 0) return null;
-
-        // Se obtiene suma total
         const sum = calcularRatingMovilidad() + calcularRatingCostoDeVida() + calcularRatingHousing() + calcularRatingCalidadDeVida();
-
-        // Se calcula y retorna el promedio
         return sum / 4;
     };
-    
+
+    // FUNCIONES DEL MODAL (de develop)
+    const handleOpenModal = () => {
+        if (!user) {
+            setMessage("Debes iniciar sesión para dejar un review.");
+            return;
+        }
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setMessage("");
+    };
+
+    const handleSubmitReview = async (form) => {
+        const reviewData = {
+            university_id: Number(id),
+            user_id: user.id,
+            anonymous: form.anonymous,
+            semester: form.semester,
+            connectivity_rating: form.connectivity.rating,
+            connectivity_description: form.connectivity.comment,
+            housing_rating: form.housing.rating,
+            housing_description: form.housing.comment,
+            cost_of_living_rating: form.cost_of_living.rating,
+            cost_of_living_description: form.cost_of_living.comment,
+            social_life_rating: form.social_life.rating,
+            social_life_description: form.social_life.comment,
+            general_description: form.general_description,
+        };
+
+        const { error } = await supabase.from("reviews").insert([reviewData]);
+        if (error) {
+            setMessage("Error al guardar el review. Intenta de nuevo.");
+        } else {
+            setMessage("¡Review enviado con éxito!");
+            setIsModalOpen(false);
+            // Recarga los reviews
+            const { data } = await supabase
+                .from('reviews')
+                .select('*, profiles:profiles!user_id(username)')
+                .eq('university_id', Number(id));
+            setReviews(data);
+        }
+    };
+
     if (!university) {
         return <div className="text-center mt-10">Cargando universidad...</div>;
     }
@@ -208,6 +212,18 @@ export default function University() {
                         )}
                     </div>
                 </div>
+                <div className="flex justify-center my-6">
+                    <button
+                        className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600 transition"
+                        onClick={handleOpenModal}
+                    >
+                        Dejar review
+                    </button>
+                </div>
+                {message && <div className="text-center text-red-500 mb-4">{message}</div>}
+                <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+                    <ReviewForm onSubmit={handleSubmitReview} onCancel={handleCloseModal} />
+                </Modal>
                 {fetchError && <p>ERROR</p>}
             </div>
         </div>
