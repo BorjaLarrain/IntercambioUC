@@ -19,7 +19,6 @@ export default function University() {
     const user = session?.user;
 
     useEffect(() => {
-        console.log("ID recibido desde useParams:", id, typeof id);
         const fetchUniversity = async () => {
             const { data, error } = await supabase
                 .from('universities')
@@ -38,16 +37,19 @@ export default function University() {
         };
 
         const fetchReviews = async () => {
+            // En el llamado a la base de datos se hace un "JOIN" con la tabla
+            // "profiles" a través de la llave foránea "user_id". Esto se hace
+            // para obtener el "username" del creador de dicha review
             const { data, error } = await supabase
                 .from('reviews')
-                .select()
+                .select('*, profiles:profiles!user_id(username)')
                 .eq('university_id', Number(id));
 
             if (error) {
                 setFetchError('No pudimos encontrar reviews para esta universidad');
+                console.log(error.message)
                 setReviews([]);
                 navigate('/');
-
             } else {
                 setReviews(data);
                 setFetchError(null);
@@ -56,9 +58,48 @@ export default function University() {
 
         fetchUniversity();
         fetchReviews();
-
     }, [id, navigate]);
 
+    // FUNCIONES DE CÁLCULO DE RATINGS (de university_and_home_pages)
+    const calcularRatingMovilidad = () => {
+        if (!reviews || reviews.length === 0) return null;
+        const ratings = reviews
+            .map(r => typeof r.connectivity_rating === 'number' ? r.connectivity_rating : parseFloat(r.connectivity_rating))
+        const sum = ratings.reduce((acc, curr) => acc + curr, 0);
+        return sum / ratings.length;
+    };
+
+    const calcularRatingCostoDeVida = () => {
+        if (!reviews || reviews.length === 0) return null;
+        const ratings = reviews
+            .map(r => typeof r.cost_of_living_rating === 'number' ? r.cost_of_living_rating : parseFloat(r.cost_of_living_rating))
+        const sum = ratings.reduce((acc, curr) => acc + curr, 0);
+        return sum / ratings.length;
+    };
+
+    const calcularRatingHousing = () => {
+        if (!reviews || reviews.length === 0) return null;
+        const ratings = reviews
+            .map(r => typeof r.housing_rating === 'number' ? r.housing_rating : parseFloat(r.housing_rating))
+        const sum = ratings.reduce((acc, curr) => acc + curr, 0);
+        return sum / ratings.length;
+    };
+
+    const calcularRatingCalidadDeVida = () => {
+        if (!reviews || reviews.length === 0) return null;
+        const ratings = reviews
+            .map(r => typeof r.social_life_rating === 'number' ? r.social_life_rating : parseFloat(r.social_life_rating))
+        const sum = ratings.reduce((acc, curr) => acc + curr, 0);
+        return sum / ratings.length;
+    };
+
+    const calcularRatingGlobal = () => {
+        if (!reviews || reviews.length === 0) return null;
+        const sum = calcularRatingMovilidad() + calcularRatingCostoDeVida() + calcularRatingHousing() + calcularRatingCalidadDeVida();
+        return sum / 4;
+    };
+
+    // FUNCIONES DEL MODAL (de develop)
     const handleOpenModal = () => {
         if (!user) {
             setMessage("Debes iniciar sesión para dejar un review.");
@@ -73,7 +114,6 @@ export default function University() {
     };
 
     const handleSubmitReview = async (form) => {
-        // Prepara los datos para Supabase
         const reviewData = {
             university_id: Number(id),
             user_id: user.id,
@@ -88,7 +128,6 @@ export default function University() {
             social_life_rating: form.social_life.rating,
             social_life_description: form.social_life.comment,
             general_description: form.general_description,
-            // Puedes agregar más campos si tu tabla los tiene
         };
 
         const { error } = await supabase.from("reviews").insert([reviewData]);
@@ -97,10 +136,10 @@ export default function University() {
         } else {
             setMessage("¡Review enviado con éxito!");
             setIsModalOpen(false);
-            // Opcional: recarga los reviews
+            // Recarga los reviews
             const { data } = await supabase
                 .from('reviews')
-                .select()
+                .select('*, profiles:profiles!user_id(username)')
                 .eq('university_id', Number(id));
             setReviews(data);
         }
@@ -110,14 +149,8 @@ export default function University() {
         return <div className="text-center mt-10">Cargando universidad...</div>;
     }
 
-    const semesterOptions = [];
-    for (let year = 2025; year >= 2015; year--) {
-      semesterOptions.push(`${year}-2`);
-      semesterOptions.push(`${year}-1`);
-    }
-
     return (
-        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center pt-24 pb-16">
+        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center pt-20 pb-5">
             <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8">
                 {/* Name and location */}
                 <div className="mb-6">
@@ -128,26 +161,26 @@ export default function University() {
                 <div className="mb-6">
                     <h2 className="text-xl font-semibold text-gray-800 mb-2">Calificación global</h2>
                     <div className="flex items-center text-3xl font-bold text-yellow-500 mb-2">
-                        ★ {university.global_rating?.toFixed(1) ?? "N/A"}
+                        ★ {calcularRatingGlobal() !== null ? calcularRatingGlobal().toFixed(1) : "Esta universidad aún no tiene una calificación"}
                     </div>
                 </div>
                 {/* Ratings for each category */}
                 <div className="w-full flex flex-wrap items-center justify-center gap-4 my-4">
-                    <div className="flex flex-col items-center bg-white border-2 border-blue-200 rounded-lg px-6 py-3 shadow-sm min-w-[160px]">
+                    <div className="flex flex-col items-center bg-white border-2 border-blue-200 rounded-lg px-6 py-3 shadow-sm min-w-[160px] hover:shadow-[0_4px_16px_rgba(50,130,246,0.15)] hover:-translate-y-1 transition-all">
                         <span className="text-lg font-semibold text-blue-600">Movilidad</span>
-                        <span className="text-2xl font-bold text-gray-800">{university.connectivity_rating}</span>
+                        <span className="text-2xl font-bold text-gray-800">{calcularRatingMovilidad() !== null ? calcularRatingMovilidad().toFixed(1) : "N/A"}</span>
                     </div>
-                    <div className="flex flex-col items-center bg-white border-2 border-blue-200 rounded-lg px-6 py-3 shadow-sm min-w-[160px]">
+                    <div className="flex flex-col items-center bg-white border-2 border-blue-200 rounded-lg px-6 py-3 shadow-sm min-w-[160px] hover:shadow-[0_4px_16px_rgba(50,130,246,0.15)] hover:-translate-y-1 transition-all">
                         <span className="text-lg font-semibold text-blue-600">Costo de vida</span>
-                        <span className="text-2xl font-bold text-gray-800">{university.cost_of_living_rating}</span>
+                        <span className="text-2xl font-bold text-gray-800">{calcularRatingCostoDeVida() !== null ? calcularRatingCostoDeVida().toFixed(1) : "N/A"}</span>
                     </div>
-                    <div className="flex flex-col items-center bg-white border-2 border-blue-200 rounded-lg px-6 py-3 shadow-sm min-w-[160px]">
+                    <div className="flex flex-col items-center bg-white border-2 border-blue-200 rounded-lg px-6 py-3 shadow-sm min-w-[160px] hover:shadow-[0_4px_16px_rgba(50,130,246,0.15)] hover:-translate-y-1 transition-all">
                         <span className="text-lg font-semibold text-blue-600">Housing</span>
-                        <span className="text-2xl font-bold text-gray-800">{university.housing_rating}</span>
+                        <span className="text-2xl font-bold text-gray-800">{calcularRatingHousing() !== null ? calcularRatingHousing().toFixed(1) : "N/A"}</span>
                     </div>
-                    <div className="flex flex-col items-center bg-white border-2 border-blue-200 rounded-lg px-6 py-3 shadow-sm min-w-[160px]">
+                    <div className="flex flex-col items-center bg-white border-2 border-blue-200 rounded-lg px-6 py-3 shadow-sm min-w-[160px] hover:shadow-[0_4px_16px_rgba(50,130,246,0.15)] hover:-translate-y-1 transition-all">
                         <span className="text-lg font-semibold text-blue-600">Calidad de vida</span>
-                        <span className="text-2xl font-bold text-gray-800">{university.social_life_rating}</span>
+                        <span className="text-2xl font-bold text-gray-800">{calcularRatingCalidadDeVida() !== null ? calcularRatingCalidadDeVida().toFixed(1) : "N/A"}</span>
                     </div>
                 </div>
 
@@ -161,11 +194,17 @@ export default function University() {
                                     key={idx}
                                     className="w-full max-w-xl bg-gray-50 rounded-2xl p-6 shadow-lg hover:shadow-[0_4px_16px_rgba(50,130,246,0.15)] hover:-translate-y-1 transition-all"
                                 >
-                                    <div className="flex items-center mb-2">
-                                        <span className="font-bold text-blue-500 mr-3">{review.user_id ?? "Anónimo"}</span>
-                                        <span className="text-yellow-500 text-lg">★ {review.global_rating?.toFixed(1) ?? "N/A"}</span>
+                                    <div className="mb-1">
+                                        <span className="font-bold text-blue-500 mr-3">
+                                            {review.profiles?.username ?? "Anónimo"} | {review.semester}
+                                        </span>
                                     </div>
-                                    <p className="text-gray-700 text-base">{review.connectivity_description || "Sin comentario"}</p>
+                                    <div className="mb-1">
+                                        <span className="text-yellow-500 text-lg">
+                                            ★ {review.global_rating?.toFixed(1) ?? "N/A"}
+                                        </span>
+                                    </div>
+                                    <p className="text-gray-700 text-base">{review.general_description || "Sin comentario"}</p>
                                 </div>
                             ))
                         ) : (
