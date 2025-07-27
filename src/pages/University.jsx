@@ -60,10 +60,10 @@ export default function University() {
     }, [id, navigate]);
 
     const handleOpenModal = () => {
-        //if (!user) {
-        //    setMessage("Debes iniciar sesión para dejar un review.");
-        //    return;
-        //}
+        if (!user) {
+            setMessage("Debes iniciar sesión para dejar un review.");
+            return;
+        }
         setIsModalOpen(true);
     };
 
