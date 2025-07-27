@@ -42,12 +42,20 @@ export default function Navbar({ menuOpen, setMenuOpen }) {
                     <Link to="/" className="text-black hover:text-blue-500 transition-colors">Home</Link>
                     <a href="#about" className="text-black hover:text-blue-500 transition-colors">Crear review</a>
                     {session ? (
-                        <button
-                            onClick={handleSignOut}
-                            className="text-black hover:text-blue-500 transition-colors cursor-pointer"
-                        >
-                            Cerrar sesión
-                        </button>
+                        <>
+                            <Link
+                                to="/miperfil"
+                                className="text-black hover:text-blue-500 transition-colors cursor-pointer"
+                            >
+                                Mi perfil
+                            </Link>
+                            <button
+                                onClick={handleSignOut}
+                                className="text-black hover:text-blue-500 transition-colors cursor-pointer"
+                            >
+                                Cerrar sesión
+                            </button>
+                        </>
                     ) : (
                         <>
                             <Link
