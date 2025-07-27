@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import supabase from "../config/supabaseClient";
 import RatingBar from "../components/RatingBar";
 import { useParams, useNavigate } from "react-router-dom";
+import Modal from "../components/Modal";
+import ReviewForm from "../components/ReviewForm";
+import { UserAuth } from "../context/AuthContext";
 
 export default function University() {
     const { id } = useParams();
@@ -10,6 +13,10 @@ export default function University() {
     const [university, setUniversity] = useState(null);
     const [reviews, setReviews] = useState([]);
     const [fetchError, setFetchError] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [message, setMessage] = useState("");
+    const { session } = UserAuth();
+    const user = session?.user;
 
     useEffect(() => {
         console.log("ID recibido desde useParams:", id, typeof id);
@@ -52,8 +59,61 @@ export default function University() {
 
     }, [id, navigate]);
 
+    const handleOpenModal = () => {
+        //if (!user) {
+        //    setMessage("Debes iniciar sesión para dejar un review.");
+        //    return;
+        //}
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setMessage("");
+    };
+
+    const handleSubmitReview = async (form) => {
+        // Prepara los datos para Supabase
+        const reviewData = {
+            university_id: Number(id),
+            user_id: user.id,
+            anonymous: form.anonymous,
+            semester: form.semester,
+            connectivity_rating: form.connectivity.rating,
+            connectivity_description: form.connectivity.comment,
+            housing_rating: form.housing.rating,
+            housing_description: form.housing.comment,
+            cost_of_living_rating: form.cost_of_living.rating,
+            cost_of_living_description: form.cost_of_living.comment,
+            social_life_rating: form.social_life.rating,
+            social_life_description: form.social_life.comment,
+            general_description: form.general_description,
+            // Puedes agregar más campos si tu tabla los tiene
+        };
+
+        const { error } = await supabase.from("reviews").insert([reviewData]);
+        if (error) {
+            setMessage("Error al guardar el review. Intenta de nuevo.");
+        } else {
+            setMessage("¡Review enviado con éxito!");
+            setIsModalOpen(false);
+            // Opcional: recarga los reviews
+            const { data } = await supabase
+                .from('reviews')
+                .select()
+                .eq('university_id', Number(id));
+            setReviews(data);
+        }
+    };
+
     if (!university) {
         return <div className="text-center mt-10">Cargando universidad...</div>;
+    }
+
+    const semesterOptions = [];
+    for (let year = 2025; year >= 2015; year--) {
+      semesterOptions.push(`${year}-2`);
+      semesterOptions.push(`${year}-1`);
     }
 
     return (
@@ -113,6 +173,18 @@ export default function University() {
                         )}
                     </div>
                 </div>
+                <div className="flex justify-center my-6">
+                    <button
+                        className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600 transition"
+                        onClick={handleOpenModal}
+                    >
+                        Dejar review
+                    </button>
+                </div>
+                {message && <div className="text-center text-red-500 mb-4">{message}</div>}
+                <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+                    <ReviewForm onSubmit={handleSubmitReview} onCancel={handleCloseModal} />
+                </Modal>
                 {fetchError && <p>ERROR</p>}
             </div>
         </div>
