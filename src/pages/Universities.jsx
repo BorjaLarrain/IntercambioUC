@@ -120,7 +120,7 @@ export default function Universities() {
         const sortedResults = [...results].sort((a, b) => {
             switch (sortBy) {
                 case 'rating':
-                    return (b.rating || 0) - (a.rating || 0);
+                    return (b.global_rating || 0) - (a.global_rating || 0);
                 case 'name':
                     return a.name.localeCompare(b.name);
                 case 'location':
