@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import supabase from "../config/supabaseClient";
-import RatingBar from "../components/RatingBar";
 import { useParams, useNavigate } from "react-router-dom";
 import Modal from "../components/Modal";
 import ReviewForm from "../components/ReviewForm";

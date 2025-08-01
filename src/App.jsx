@@ -12,9 +12,12 @@ function App() {
   // Función que maneja la búsqueda
   const handleSearch = (e) => {
     e.preventDefault();
-
-    // FALTA
+  
+    if (search.trim() === "") return;
+  
+    navigate(`/universidades?query=${encodeURIComponent(search.trim())}`);
   };
+  
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-b from-blue-50 to-white px-4">
@@ -24,6 +27,8 @@ function App() {
       <form onSubmit={handleSearch} className="w-full max-w-xl flex items-center mb-8">
         <input
           type="text"
+          id='search'
+          name='search'
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Busca una universidad..."
