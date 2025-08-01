@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import supabase from "../config/supabaseClient";
-import RatingBar from "../components/RatingBar";
 import { useParams, useNavigate } from "react-router-dom";
 import Modal from "../components/Modal";
 import ReviewForm from "../components/ReviewForm";
@@ -214,7 +213,7 @@ export default function University() {
                 </div>
                 <div className="flex justify-center my-6">
                     <button
-                        className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600 transition"
+                        className="hover:cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition-colors"
                         onClick={handleOpenModal}
                     >
                         Dejar review

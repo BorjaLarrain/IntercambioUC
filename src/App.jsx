@@ -13,17 +13,22 @@ function App() {
   const handleSearch = (e) => {
     e.preventDefault();
 
-    // FALTA
+    if (search.trim() === "") return;
+
+    navigate(`/universidades?query=${encodeURIComponent(search.trim())}`);
   };
 
+
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-b from-blue-50 to-white px-4">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-b from-blue-50 to-white px-4 pt-25">
       <h1 className="text-blue-500 text-4xl font-bold mb-4 text-center">¿Qué universidad estás buscando?</h1>
       <p className="text-gray-600 text-lg text-center mb-1">Descubre calificaciones, opiniones y reseñas de todas las universidades disponibles</p>
       <p className="text-gray-600 text-lg text-center mb-8">para realizar tu intercambio académico en la UC.</p>
       <form onSubmit={handleSearch} className="w-full max-w-xl flex items-center mb-8">
         <input
           type="text"
+          id='search'
+          name='search'
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Busca una universidad..."
@@ -53,6 +58,19 @@ function App() {
           Buscar
         </button>
       </div>
+
+      {!session && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8 mt-20">
+          <h3 className="text-lg font-semibold text-blue-800 mb-2">¿Ya tienes experiencia en el extranjero?</h3>
+          <p className="mb-4">Comparte tu experiencia y ayuda a otros estudiantes a tomar la mejor decisión.</p>
+          <button
+            onClick={() => navigate('/signup')}
+            className="hover:cursor-pointer w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition-colors"
+          >
+            Crear cuenta
+          </button>
+        </div>
+      )}
     </div>
   )
 }

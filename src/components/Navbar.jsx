@@ -39,8 +39,8 @@ export default function Navbar({ menuOpen, setMenuOpen }) {
 
                 {/* DESKTOK */}
                 <div className="hidden md:flex items-center space-x-8">
-                    <Link to="/" className="text-black hover:text-blue-500 transition-colors">Home</Link>
-                    <a href="#about" className="text-black hover:text-blue-500 transition-colors">Crear review</a>
+                    <Link to="/" className="text-black hover:text-blue-500 transition-colors">Inicio</Link>
+                    <a href="#about" className="text-black hover:text-blue-500 transition-colors">Crear reseña</a>
                     {session ? (
                         <>
                             <Link
