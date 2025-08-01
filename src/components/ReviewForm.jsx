@@ -68,14 +68,14 @@ export default function ReviewForm({ onSubmit, onCancel }) {
           <div className="flex gap-4">
             <button
               type="button"
-              className={`px-4 py-2 rounded ${form.anonymous ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
+              className={`hover:cursor-pointer px-4 py-2 rounded-lg shadow transition-colors font-semibold ${form.anonymous ? "bg-blue-500 hover:bg-blue-600 text-white" : "bg-blue-100 hover:bg-blue-200 text-blue-600"}`}
               onClick={() => setForm(prev => ({ ...prev, anonymous: true }))}
             >
               Sí
             </button>
             <button
               type="button"
-              className={`px-4 py-2 rounded ${!form.anonymous ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
+              className={`hover:cursor-pointer px-4 py-2 rounded-lg shadow transition-colors font-semibold ${!form.anonymous ? "bg-blue-500 hover:bg-blue-600 text-white" : "bg-blue-100 hover:bg-blue-200 text-blue-600"}`}
               onClick={() => setForm(prev => ({ ...prev, anonymous: false }))}
             >
               No
@@ -122,7 +122,7 @@ export default function ReviewForm({ onSubmit, onCancel }) {
         {step > 0 && (
           <button
             type="button"
-            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 font-semibold flex-1"
+            className="hover:cursor-pointer bg-blue-100 hover:bg-blue-200 text-blue-600 font-semibold py-2 px-4 rounded-lg shadow transition-colors flex-1"
             onClick={handlePrev}
           >
             Anterior
@@ -131,7 +131,7 @@ export default function ReviewForm({ onSubmit, onCancel }) {
         {step < steps.length - 1 ? (
           <button
             type="button"
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 font-semibold flex-1"
+            className="hover:cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors flex-1"
             onClick={handleNext}
             disabled={current.key !== "anonymous" && current.key !== "semester" && form[current.key].rating === 0}
           >
@@ -140,7 +140,7 @@ export default function ReviewForm({ onSubmit, onCancel }) {
         ) : (
           <button
             type="submit"
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-semibold flex-1"
+            className="hover:cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors flex-1"
             disabled={form.general_description.trim() === ""}
           >
             Enviar
@@ -149,7 +149,7 @@ export default function ReviewForm({ onSubmit, onCancel }) {
       </div>
       <button
         type="button"
-        className="mt-6 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded w-full text-center transition"
+        className="hover:cursor-pointer mt-6 bg-blue-100 hover:bg-blue-200 text-blue-600 font-semibold py-2 px-4 rounded-lg shadow transition-colors w-full text-center"
         onClick={onCancel}
       >
         Cancelar

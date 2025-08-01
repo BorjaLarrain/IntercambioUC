@@ -29,13 +29,13 @@ export default function Universities() {
     const [filters, setFilters] = useState({
         continent: "",
         rating: "",
-        country: ""
+        location: ""
     });
 
     // Estados para paginación
     const [displayedResults, setDisplayedResults] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [resultsPerPage] = useState(9);
+    const [resultsPerPage] = useState(6);
     const [loadingMore, setLoadingMore] = useState(false);
 
     // useEffect para la búsqueda de los resultados
@@ -58,8 +58,8 @@ export default function Universities() {
                 queryBuilder = queryBuilder.eq("continent", filters.continent);
             }
 
-            if (filters.country) {
-                queryBuilder = queryBuilder.eq("country", filters.country);
+            if (filters.location) {
+                queryBuilder = queryBuilder.eq("location", filters.location);
             }
 
             if (filters.rating) {
@@ -110,7 +110,7 @@ export default function Universities() {
         setFilters({
             continent: "",
             rating: "",
-            country: ""
+            location: ""
         });
         setSearchTerm("");
     };
@@ -123,8 +123,8 @@ export default function Universities() {
                     return (b.rating || 0) - (a.rating || 0);
                 case 'name':
                     return a.name.localeCompare(b.name);
-                case 'country':
-                    return a.country.localeCompare(b.country);
+                case 'location':
+                    return a.location.localeCompare(b.location);
                 default:
                     return 0;
             }
@@ -181,7 +181,7 @@ export default function Universities() {
                                 >
                                     <option value="rating">Rating</option>
                                     <option value="name">Nombre</option>
-                                    <option value="country">País</option>
+                                    <option value="location">País</option>
                                 </select>
                             </div>
                         )}
@@ -197,7 +197,7 @@ export default function Universities() {
                             <p className="text-gray-500 mb-4">Intenta ajustar tus filtros o términos de búsqueda</p>
                             <button
                                 onClick={clearFilters}
-                                className="cursor-pointer px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+                                className="hover:cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition-colors"
                             >
                                 Limpiar filtros
                             </button>
@@ -226,7 +226,7 @@ export default function Universities() {
                                     <button
                                         onClick={loadMoreResults}
                                         disabled={loadingMore}
-                                        className="cursor-pointer px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-lg transition-colors flex items-center justify-center mx-auto space-x-2"
+                                        className="hover:cursor-pointer bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-lg shadow transition-colors flex items-center justify-center mx-auto space-x-2"
                                     >
                                         {loadingMore ? (
                                             <>

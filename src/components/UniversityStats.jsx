@@ -5,16 +5,16 @@ export default function UniversityStats({ results, filters }) {
     const stats = {
         total: results.length,
         averageRating: results.length > 0 
-            ? (results.reduce((sum, uni) => sum + (uni.rating || 0), 0) / results.length).toFixed(1)
+            ? (results.reduce((sum, uni) => sum + (uni.global_rating || 0), 0) / results.length).toFixed(1)
             : 0,
-        topRated: results.filter(uni => uni.rating >= 4.5).length,
-        countries: new Set(results.map(uni => uni.country)).size,
+        topRated: results.filter(uni => uni.global_rating >= 4.5).length,
+        countries: new Set(results.map(uni => uni.location)).size,
         continents: new Set(results.map(uni => uni.continent).filter(Boolean)).size
     };
 
     // Obtener países más comunes
     const countryCounts = results.reduce((acc, uni) => {
-        acc[uni.country] = (acc[uni.country] || 0) + 1;
+        acc[uni.location] = (acc[uni.location] || 0) + 1;
         return acc;
     }, {});
 
@@ -62,29 +62,6 @@ export default function UniversityStats({ results, filters }) {
                                 {country} ({count})
                             </span>
                         ))}
-                    </div>
-                </div>
-            )}
-
-            {Object.values(filters).some(value => value && value !== "") && (
-                <div className="mt-4 pt-4 border-t border-gray-300">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Filtros aplicados:</h4>
-                    <div className="flex flex-wrap gap-2">
-                        {filters.continent && (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                Continente: {filters.continent}
-                            </span>
-                        )}
-                        {filters.country && (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                País: {filters.country}
-                            </span>
-                        )}
-                        {filters.rating && (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                Rating: {filters.rating}+
-                            </span>
-                        )}
                     </div>
                 </div>
             )}

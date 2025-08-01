@@ -3,7 +3,7 @@ import React from "react";
 export default function UniversityFilters({ filters, setFilters, onClearFilters }) {
     // Opciones para los filtros
     const continents = ["Europa", "América del Norte", "América del Sur", "Asia", "África", "Oceanía"];
-    const countries = ["Estados Unidos", "Reino Unido", "Canadá", "Australia", "Alemania", "Francia", "España", "Italia", "Países Bajos", "Suecia", "Noruega", "Dinamarca", "Suiza", "Austria", "Bélgica", "Irlanda", "Nueva Zelanda", "Singapur", "Hong Kong", "Japón", "Corea del Sur"];
+    const countries = ["Alemania", "Argentina", "Australia", "Austria", "Bélgica", "Bolivia", "Brasil", "Canadá", "China", "Colombia", "Corea del Sur", "Costa Rica", "Croacia", "Dinamarca", "España", "Estados Unidos", "Finlandia", "Francia", "India", "Indonesia", "Irlanda", "Italia", "Japón", "Malasia", "México", "Noruega", "Nueva Zelanda", "Países Bajos", "Paraguay", "Perú", "Portugal", "Reino Unido", "República Dominicana", "Sudáfrica", "Suecia", "Suiza", "Uruguay"];
     const ratingRanges = [
         { label: "Cualquier rating", value: "" },
         { label: "4.5 o más", value: "4.5" },
@@ -19,7 +19,7 @@ export default function UniversityFilters({ filters, setFilters, onClearFilters 
                 <div className="flex items-center space-x-3">
                     <button
                         onClick={onClearFilters}
-                        className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                        className="hover:cursor-pointer bg-blue-100 hover:bg-blue-200 text-blue-600 font-semibold py-2 px-4 rounded-lg shadow transition-colors text-sm"
                     >
                         Limpiar filtros
                     </button>
@@ -54,8 +54,8 @@ export default function UniversityFilters({ filters, setFilters, onClearFilters 
                             País
                         </label>
                         <select
-                            value={filters.country}
-                            onChange={(e) => setFilters({...filters, country: e.target.value})}
+                            value={filters.location}
+                            onChange={(e) => setFilters({...filters, location: e.target.value})}
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                         >
                             <option value="">Todos los países</option>
@@ -97,9 +97,9 @@ export default function UniversityFilters({ filters, setFilters, onClearFilters 
                                 </span>
                             )}
 
-                            {filters.country && (
+                            {filters.location && (
                                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    País: {filters.country}
+                                    País: {filters.location}
                                 </span>
                             )}
                             
