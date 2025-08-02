@@ -8,6 +8,7 @@ const steps = [
   { key: "housing", label: "Alojamiento", helper: "¿Cómo era la calidad y precio del alojamiento? ¿Era difícil encontrar un lugar para vivir?" },
   { key: "cost_of_living", label: "Costo de vida", helper: "¿Era caro vivir ahí? ¿Qué gastos eran los más altos?" },
   { key: "social_life", label: "Vida social", helper: "¿Había actividades para estudiantes? ¿Era fácil hacer amigos?" },
+  { key: "academic_experience", label: "Experiencia Académica", helper: "¿Era buena la oferta de ramos disponibles para alumnos de intercambio? ¿Fueron fáciles de convalidar? ¿Qué ramos cursaste? ¿Era buena la calidad de los cursos?" },
   { key: "general_description", label: "Descripción general", helper: "Danos una breve descripción de tu experiencia. Si quieres, puedes agregar cosas que no fueron cubiertas en los otros campos." }
 ];
 
@@ -20,6 +21,7 @@ export default function ReviewForm({ onSubmit, onCancel }) {
     housing: { rating: 0, comment: "" },
     cost_of_living: { rating: 0, comment: "" },
     social_life: { rating: 0, comment: "" },
+    academic_experience: { rating: 0, comment: "" },
     general_description: "",
   });
 
