@@ -70,7 +70,7 @@ export default function Profile() {
     };
 
     return (
-        <div className="flex items-center justify-center bg-gradient-to-b from-blue-50 to-white">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white">
             <form onSubmit={handleSubmit} className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 border border-gray-100">
                 <h2 className="text-3xl font-bold text-blue-500 text-center mb-3">Mi perfil</h2>
                 <div className="space-y-4 mb-6">

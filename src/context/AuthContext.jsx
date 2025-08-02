@@ -6,24 +6,72 @@ const AuthContext = createContext();
 export const AuthContextProvider = ({ children }) => {
     const [session, setSession] = useState(undefined);
 
+    // Función para guardar el nombre de usuario de Google en la tabla profiles
+    const saveGoogleUsername = async (user) => {
+        if (!user || !user.user_metadata) return;
+
+        // Extraer el nombre del usuario de Google
+        const googleName = user.user_metadata.full_name || user.user_metadata.name;
+        
+        if (!googleName) return;
+
+        try {
+            // Verificar si ya existe un perfil para este usuario
+            const { data: existingProfile } = await supabase
+                .from('profiles')
+                .select('username')
+                .eq('id', user.id)
+                .single();
+
+            // Solo actualizar si no tiene username o si el username está vacío
+            if (!existingProfile || !existingProfile.username) {
+                const { error } = await supabase
+                    .from('profiles')
+                    .upsert({
+                        id: user.id,
+                        username: googleName,
+                        email: user.email,
+                        updated_at: new Date()
+                    });
+
+                if (error) {
+                    console.error('Error al guardar el nombre de usuario de Google:', error);
+                } else {
+                    console.log('Nombre de usuario de Google guardado exitosamente:', googleName);
+                }
+            }
+        } catch (error) {
+            console.error('Error al procesar el perfil de Google:', error);
+        }
+    };
+
     // Va actualizando el valor de "session"
     useEffect(() => {
         // Se obtiene la sesión actual
         supabase.auth.getSession().then(({ data: { session } }) => {
             // Se actualiza el estado de "session"
-            setSession(session)
-        })
+            setSession(session);
+            
+            // Si hay sesión y es un usuario de Google, guardar el nombre
+            if (session?.user && session.user.app_metadata?.provider === 'google') {
+                saveGoogleUsername(session.user);
+            }
+        });
 
         // Se "escuchan" cambios en tiempo real en torno a la autenticación
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session)
-        })
+            setSession(session);
+            
+            // Si hay sesión y es un usuario de Google, guardar el nombre
+            if (session?.user && session.user.app_metadata?.provider === 'google') {
+                saveGoogleUsername(session.user);
+            }
+        });
 
-        return () => subscription.unsubscribe()
-
-    }, [])
+        return () => subscription.unsubscribe();
+    }, []);
 
     // Función para crear cuenta (SignUp) (notar que es pasada hacia el componente "SignUp.jsx")
     const signUpNewUser = async (email, password) => {

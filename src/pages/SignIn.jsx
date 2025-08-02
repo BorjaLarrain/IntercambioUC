@@ -104,7 +104,7 @@ export default function SignIn() {
                     Iniciar sesión con Google
                 </button>
 
-                {error && <div className="text-red-600 font-semibold w-full mt-5 text-center">{error}</div>}
+                {error && loading && <div className="text-red-600 font-semibold w-full mt-5 text-center">{error}</div>}
             </form>
         </div>
     );
