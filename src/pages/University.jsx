@@ -152,9 +152,21 @@ export default function University() {
         <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center pt-20 pb-5">
             <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8">
                 {/* Name and location */}
-                <div className="mb-6">
+                <div className="mb-1">
                     <h1 className="text-4xl font-bold text-blue-500 mb-2">{university.name}</h1>
-                    <p className="text-lg text-gray-600">{university.location}</p>
+                    <div className="flex items-center">
+                        <svg className="h-4 w-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        {university.location}
+                    </div>
+                    <div className="flex items-center mb-4">
+                        <svg className="h-4 w-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {university.continent}
+                    </div>
                 </div>
                 {/* Global rating */}
                 <div className="mb-6">

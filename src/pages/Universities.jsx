@@ -63,7 +63,7 @@ export default function Universities() {
             }
 
             if (filters.rating) {
-                queryBuilder = queryBuilder.gte("rating", parseFloat(filters.rating));
+                queryBuilder = queryBuilder.gte("global_rating", parseFloat(filters.rating));
             }
 
             const { data, error } = await queryBuilder;
