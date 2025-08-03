@@ -4,6 +4,37 @@ export default function UniversityFilters({ filters, setFilters, onClearFilters 
     // Opciones para los filtros
     const continents = ["Europa", "América del Norte", "América del Sur", "Asia", "África", "Oceanía"];
     const countries = ["Alemania", "Argentina", "Australia", "Austria", "Bélgica", "Bolivia", "Brasil", "Canadá", "China", "Colombia", "Corea del Sur", "Costa Rica", "Croacia", "Dinamarca", "España", "Estados Unidos", "Finlandia", "Francia", "India", "Indonesia", "Irlanda", "Italia", "Japón", "Malasia", "México", "Noruega", "Nueva Zelanda", "Países Bajos", "Paraguay", "Perú", "Portugal", "Reino Unido", "República Dominicana", "Sudáfrica", "Suecia", "Suiza", "Uruguay"];
+
+    const europa = [
+        "Alemania", "Austria", "Bélgica", "Croacia", "Dinamarca",
+        "España", "Finlandia", "Francia", "Irlanda", "Italia",
+        "Noruega", "Países Bajos", "Portugal", "Reino Unido",
+        "Suecia", "Suiza"
+    ];
+
+    const americaDelNorte = [
+        "Canadá", "Estados Unidos", "México", "Costa Rica", "República Dominicana"
+    ];
+
+    const americaDelSur = [
+        "Argentina", "Bolivia", "Brasil", "Colombia",
+        "Paraguay", "Perú", "Uruguay"
+    ];
+
+    const asia = [
+        "China", "Corea del Sur", "India", "Indonesia",
+        "Japón", "Malasia"
+    ];
+
+    const africa = [
+        "Sudáfrica"
+    ];
+
+    const oceania = [
+        "Australia", "Nueva Zelanda"
+    ];
+
+
     const ratingRanges = [
         { label: "Cualquier rating", value: "" },
         { label: "4.5 o más", value: "4.5" },
@@ -25,7 +56,7 @@ export default function UniversityFilters({ filters, setFilters, onClearFilters 
                     </button>
                 </div>
             </div>
-            
+
             <div className="block">
                 {/* Filtros principales */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -36,7 +67,7 @@ export default function UniversityFilters({ filters, setFilters, onClearFilters 
                         </label>
                         <select
                             value={filters.continent}
-                            onChange={(e) => setFilters({...filters, continent: e.target.value})}
+                            onChange={(e) => setFilters({ ...filters, continent: e.target.value })}
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                         >
                             <option value="">Todos los continentes</option>
@@ -55,11 +86,54 @@ export default function UniversityFilters({ filters, setFilters, onClearFilters 
                         </label>
                         <select
                             value={filters.location}
-                            onChange={(e) => setFilters({...filters, location: e.target.value})}
+                            onChange={(e) => setFilters({ ...filters, location: e.target.value })}
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                         >
                             <option value="">Todos los países</option>
-                            {countries.map((country) => (
+                            {/* Todos los países */}
+                            {!filters.continent && countries.map((country) => (
+                                <option key={country} value={country}>
+                                    {country}
+                                </option>
+                            ))}
+
+                            {/* Europa */}
+                            {filters.continent === "Europa" && europa.map((country) => (
+                                <option key={country} value={country}>
+                                    {country}
+                                </option>
+                            ))}
+
+                            {/* América del Norte */}
+                            {filters.continent === "América del Norte" && americaDelNorte.map((country) => (
+                                <option key={country} value={country}>
+                                    {country}
+                                </option>
+                            ))}
+
+                            {/* América del Sur */}
+                            {filters.continent === "América del Sur" && americaDelSur.map((country) => (
+                                <option key={country} value={country}>
+                                    {country}
+                                </option>
+                            ))}
+
+                            {/* Asia */}
+                            {filters.continent === "Asia" && asia.map((country) => (
+                                <option key={country} value={country}>
+                                    {country}
+                                </option>
+                            ))}
+
+                            {/* África */}
+                            {filters.continent === "África" && africa.map((country) => (
+                                <option key={country} value={country}>
+                                    {country}
+                                </option>
+                            ))}
+
+                            {/* Oceanía */}
+                            {filters.continent === "Oceanía" && oceania.map((country) => (
                                 <option key={country} value={country}>
                                     {country}
                                 </option>
@@ -74,7 +148,7 @@ export default function UniversityFilters({ filters, setFilters, onClearFilters 
                         </label>
                         <select
                             value={filters.rating}
-                            onChange={(e) => setFilters({...filters, rating: e.target.value})}
+                            onChange={(e) => setFilters({ ...filters, rating: e.target.value })}
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                         >
                             {ratingRanges.map((range) => (
@@ -102,7 +176,7 @@ export default function UniversityFilters({ filters, setFilters, onClearFilters 
                                     País: {filters.location}
                                 </span>
                             )}
-                            
+
                             {filters.rating && (
                                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                     Rating: {filters.rating}+
