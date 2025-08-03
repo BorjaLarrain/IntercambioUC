@@ -62,7 +62,7 @@ export default function Footer() {
                             </div>
                             <div className="flex items-center space-x-3">
                                 <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                                    <span className="text-xs font-semibold text-gray-600">F</span>
+                                    <span className="text-xs font-semibold text-gray-600">B</span>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-gray-900">Borja Larraín</p>
