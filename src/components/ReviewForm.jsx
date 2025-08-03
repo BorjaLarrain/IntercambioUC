@@ -2,7 +2,7 @@ import { useState } from "react";
 import RatingBar from "./RatingBar";
 
 const steps = [
-  { key: "anonymous", label: "¿Quieres que tu review sea anónimo?", helper: "Tu nombre no será visible si eliges que sea anónimo." },
+  { key: "anonymous", label: "¿Quieres que tu reseña sea anónima?", helper: "Tu nombre no será visible si eliges que sea anónimo." },
   { key: "semester", label: "Semestre de intercambio", helper: "¿En qué semestre realizaste tu intercambio?" },
   { key: "connectivity", label: "Conectividad", helper: "¿Era bueno el transporte público? ¿Qué tan fácil era moverse dentro y fuera de la ciudad?" },
   { key: "housing", label: "Alojamiento", helper: "¿Cómo era la calidad y precio del alojamiento? ¿Era difícil encontrar un lugar para vivir?" },

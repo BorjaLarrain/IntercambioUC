@@ -29,7 +29,7 @@ function App() {
       const { data, error } = await supabase
         .from("universities")
         .select("*")
-        .order("global_rating", { ascending: true })
+        .order("global_rating", { ascending: false, nullsFirst: false })
         .limit(9);
 
       if (error) {
@@ -155,8 +155,8 @@ function App() {
                     key={index}
                     onClick={() => setCurrentSlide(index)}
                     className={`hover:cursor-pointer  w-3 h-3 rounded-full transition-all duration-200 ${currentSlide === index
-                        ? 'bg-blue-500 scale-110'
-                        : 'bg-gray-300 hover:bg-gray-400'
+                      ? 'bg-blue-500 scale-110'
+                      : 'bg-gray-300 hover:bg-gray-400'
                       }`}
                   />
                 ))}
