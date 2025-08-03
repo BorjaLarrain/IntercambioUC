@@ -112,7 +112,7 @@ function App() {
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Universidades Destacadas</h2>
             <p className="text-gray-600">Las mejores universidades según las calificaciones de los estudiantes</p>
           </div>
-          
+
           <div className="relative">
             {/* Botones de navegación */}
             {results.length > 3 && (
@@ -154,11 +154,10 @@ function App() {
                   <button
                     key={index}
                     onClick={() => setCurrentSlide(index)}
-                    className={`hover:cursor-pointer  w-3 h-3 rounded-full transition-all duration-200 ${
-                      currentSlide === index 
-                        ? 'bg-blue-500 scale-110' 
+                    className={`hover:cursor-pointer  w-3 h-3 rounded-full transition-all duration-200 ${currentSlide === index
+                        ? 'bg-blue-500 scale-110'
                         : 'bg-gray-300 hover:bg-gray-400'
-                    }`}
+                      }`}
                   />
                 ))}
               </div>
@@ -172,12 +171,10 @@ function App() {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8 mt-25">
           <h3 className="text-lg font-semibold text-blue-800 mb-2">¿Ya tienes experiencia en el extranjero?</h3>
           <p className="mb-4">Comparte tu experiencia y ayuda a otros estudiantes a tomar la mejor decisión.</p>
-          <button
-            onClick={() => navigate('/signup')}
-            className="hover:cursor-pointer w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition-colors"
-          >
-            Crear cuenta
-          </button>
+          <div className='flex gap-3'>
+            <a href="/signup" className="hover:cursor-pointer w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition-colors">Crear cuenta</a>
+            <a href="/signin" className="hover:cursor-pointer w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition-colors">Iniciar sesión</a>
+          </div>
         </div>
       )}
     </div>

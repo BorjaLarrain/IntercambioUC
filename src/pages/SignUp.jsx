@@ -43,7 +43,7 @@ export default function SignUp() {
             <form onSubmit={handleSignUp} className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 border border-gray-100">
                 <h2 className="text-3xl font-bold text-blue-500 mb-2 text-center">Crear cuenta</h2>
                 <p className="text-center text-gray-600 mb-6">
-                    Ya tienes una cuenta?{' '}
+                    ¿Ya tienes una cuenta?{' '}
                     <Link to="/signin" className="text-blue-500 hover:underline font-semibold">Inicia sesión!</Link>
                 </p>
 
