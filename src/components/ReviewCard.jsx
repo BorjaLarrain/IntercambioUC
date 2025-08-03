@@ -45,7 +45,7 @@ export default function ReviewCard({ review }) {
             {/* Botón para abrir modal */}
             <button
                 onClick={() => setIsModalOpen(true)}
-                className="text-blue-500 hover:text-blue-700 text-sm font-medium"
+                className="hover:cursor-pointer text-blue-500 hover:text-blue-700 text-sm font-medium"
             >
                 Ver review completo
             </button>

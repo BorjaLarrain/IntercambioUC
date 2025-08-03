@@ -1,7 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
 export default function ReviewDetailModal({ review, isOpen, onClose }) {
+    // Bloquear scroll del body cuando el modal está abierto
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Restaurar scroll cuando el modal se cierra o el componente se desmonta
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
+
     if (!isOpen || !review) return null;
 
     // Calcular rating global si no existe

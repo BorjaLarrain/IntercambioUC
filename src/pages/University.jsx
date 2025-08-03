@@ -256,9 +256,9 @@ export default function University() {
                 <div className="flex justify-center my-6">
                     {userHasReviewed ? (
                         <div className="text-center">
-                            <p className="text-green-600 font-medium mb-2">✅ Ya has dejado un review para esta universidad</p>
+                            <p className="text-green-600 mb-2 font-semibold">✅ Ya has dejado un review para esta universidad</p>
                             <button
-                                className="bg-gray-400 text-white px-6 py-2 rounded-lg shadow cursor-not-allowed"
+                                className="bg-gray-400 text-white px-6 py-2 rounded-lg shadow cursor-not-allowed hover:cursor-pointer"
                                 disabled
                             >
                                 Dejar review
@@ -266,7 +266,7 @@ export default function University() {
                         </div>
                     ) : (
                         <button
-                            className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600 transition"
+                            className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600 transition hover:cursor-pointer"
                             onClick={handleOpenModal}
                         >
                             Dejar review
