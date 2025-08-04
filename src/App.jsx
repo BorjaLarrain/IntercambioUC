@@ -5,6 +5,7 @@ import { UserAuth } from './context/AuthContext';
 import { useEffect } from 'react';
 import supabase from './config/supabaseClient';
 import UniversityCard from './components/UniversityCard';
+import { Link } from "react-router-dom";
 
 function App() {
   // Estados
@@ -172,8 +173,8 @@ function App() {
           <h3 className="text-lg font-semibold text-blue-800 mb-2">¿Ya tienes experiencia en el extranjero?</h3>
           <p className="mb-4">Comparte tu experiencia y ayuda a otros estudiantes a tomar la mejor decisión.</p>
           <div className='flex gap-3'>
-            <a href="/signup" className="hover:cursor-pointer w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition-colors">Crear cuenta</a>
-            <a href="/signin" className="hover:cursor-pointer w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition-colors">Iniciar sesión</a>
+            <Link to="/signup" className="hover:cursor-pointer w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition-colors">Crear cuenta</Link>
+            <Link to="/signin" className="hover:cursor-pointer w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition-colors">Iniciar sesión</Link>
           </div>
         </div>
       )}
