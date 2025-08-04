@@ -38,6 +38,24 @@ export default function SignUp() {
         }
     }
 
+    // Función para manejo de inicio de sesión con Google
+    const handleSignInGoogle = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const result = await signInGoogle();
+
+            if (result.success) {
+                navigate('/');
+            }
+        } catch (err) {
+            setError("ocurrió un error");
+        } finally {
+            setLoading(false);
+        }
+    }
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white py-12 px-4">
             <form onSubmit={handleSignUp} className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 border border-gray-100">
@@ -74,7 +92,16 @@ export default function SignUp() {
                     Crear cuenta
                 </button>
 
-                {error && <div className="text-red-600 font-semibold w-full mt-5 text-center">{error}</div>}
+                <button
+                    type="button"
+                    className="mt-2 hover:cursor-pointer w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg shadow transition-colors"
+                    onClick={handleSignInGoogle}
+                    disabled={loading}
+                >
+                    Crear cuenta con Google
+                </button>
+
+                {error && loading && <div className="text-red-600 font-semibold w-full mt-5 text-center">{error}</div>}
             </form>
         </div>
     )
