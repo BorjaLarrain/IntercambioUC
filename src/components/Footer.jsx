@@ -1,7 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { UserAuth } from "../context/AuthContext";
 
 export default function Footer() {
+    const { session } = UserAuth();
+
     return (
         <footer className="bg-gradient-to-r from-blue-50 to-indigo-50 border-t border-blue-200 py-8 mt-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -28,9 +31,11 @@ export default function Footer() {
                             <li>
                                 <Link to="/" className="text-gray-600 hover:text-blue-600 transition-colors">Inicio</Link>
                             </li>
-                            <li>
-                                <Link to="/miperfil" className="text-gray-600 hover:text-blue-600 transition-colors">Mi perfil</Link>
-                            </li>
+                            {session && (
+                                <li>
+                                    <Link to="/miperfil" className="text-gray-600 hover:text-blue-600 transition-colors">Mi perfil</Link>
+                                </li>
+                            )}
                             <li>
                                 <Link to="/universidades" className="text-gray-600 hover:text-blue-600 transition-colors">Explorar universidades</Link>
                             </li>
@@ -83,6 +88,7 @@ export default function Footer() {
                         </div>
                     </div>
                 </div>
+      
             </div>
         </footer>
     );
