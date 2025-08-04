@@ -3,6 +3,7 @@ import supabase from "../config/supabaseClient";
 import { useParams, useNavigate } from "react-router-dom";
 import Modal from "../components/Modal";
 import ReviewForm from "../components/ReviewForm";
+import EditReviewForm from "../components/EditReviewForm";
 import ReviewCard from "../components/ReviewCard";
 import { UserAuth } from "../context/AuthContext";
 
@@ -14,6 +15,8 @@ export default function University() {
     const [reviews, setReviews] = useState([]);
     const [fetchError, setFetchError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [editingReview, setEditingReview] = useState(null);
     const [message, setMessage] = useState("");
     const { session } = UserAuth();
     const user = session?.user;
@@ -121,6 +124,8 @@ export default function University() {
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
+        setIsEditMode(false);
+        setEditingReview(null);
         setMessage("");
     };
 
@@ -180,6 +185,94 @@ export default function University() {
         }
     };
 
+    // Función para eliminar review
+    const handleDeleteReview = async (reviewId) => {
+        try {
+            const { error } = await supabase
+                .from('reviews')
+                .delete()
+                .eq('id', reviewId);
+
+            if (error) {
+                setMessage("Error al eliminar el review. Intenta de nuevo.");
+                console.error("Error:", error);
+            } else {
+                setMessage("Review eliminado con éxito!");
+                // Recargar reviews
+                const { data } = await supabase
+                    .from('reviews')
+                    .select('*, profiles:profiles!user_id(username)')
+                    .eq('university_id', Number(id));
+                setReviews(data);
+            }
+        } catch (error) {
+            setMessage("Error al eliminar el review.");
+            console.error("Error:", error);
+        }
+    };
+
+    // Función para editar review
+    const handleEditReview = (review) => {
+        setEditingReview(review);
+        setIsEditMode(true);
+        setIsModalOpen(true);
+    };
+
+    // Función para actualizar review
+    const handleUpdateReview = async (form) => {
+        if (!editingReview) return;
+
+        // Calcular rating global
+        const globalRating = (
+            form.connectivity.rating +
+            form.housing.rating +
+            form.cost_of_living.rating +
+            form.social_life.rating +
+            form.academic_experience.rating
+        ) / 5;
+
+        const reviewData = {
+            anonymous: form.anonymous || false,
+            semester: form.semester,
+            connectivity_rating: form.connectivity.rating || 0,
+            connectivity_description: form.connectivity.comment || "",
+            housing_rating: form.housing.rating || 0,
+            housing_description: form.housing.comment || "",
+            cost_of_living_rating: form.cost_of_living.rating || 0,
+            cost_of_living_description: form.cost_of_living.comment || "",
+            social_life_rating: form.social_life.rating || 0,
+            social_life_description: form.social_life.comment || "",
+            academic_experience_rating: form.academic_experience.rating || 0,
+            academic_experience_description: form.academic_experience.comment || "",
+            general_description: form.general_description || "",
+            total_rating: globalRating || 0,
+        };
+
+        try {
+            const { error } = await supabase
+                .from('reviews')
+                .update(reviewData)
+                .eq('id', editingReview.id);
+
+            if (error) {
+                setMessage("Error al actualizar el review. Intenta de nuevo.");
+                console.error("Error:", error);
+            } else {
+                setMessage("¡Review actualizado con éxito!");
+                handleCloseModal();
+                // Recargar reviews
+                const { data } = await supabase
+                    .from('reviews')
+                    .select('*, profiles:profiles!user_id(username)')
+                    .eq('university_id', Number(id));
+                setReviews(data);
+            }
+        } catch (error) {
+            setMessage("Error al actualizar el review.");
+            console.error("Error:", error);
+        }
+    };
+
     if (!university) {
         return <div className="text-center mt-10">Cargando universidad...</div>;
     }
@@ -214,7 +307,7 @@ export default function University() {
                 {/* Ratings for each category */}
                 <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 my-6">
                     <div className="flex flex-col items-center bg-white border-2 border-blue-200 rounded-xl px-4 py-6 shadow-sm hover:shadow-[0_4px_16px_rgba(50,130,246,0.15)] hover:-translate-y-1 transition-all">
-                        <div className="text-3xl mb-3">🚇</div>
+                        <div className="text-3xl mb-3">🚍✈️🚊</div>
                         <span className="text-base font-semibold text-blue-600 text-center mb-3">Movilidad</span>
                         <span className="text-3xl font-bold text-gray-800">{calcularRatingMovilidad() !== null ? calcularRatingMovilidad().toFixed(1) : "N/A"}</span>
                     </div>
@@ -246,7 +339,12 @@ export default function University() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-items-center">
                         {reviews && reviews.length > 0 ? (
                             reviews.map((review, idx) => (
-                                <ReviewCard key={idx} review={review} />
+                                <ReviewCard 
+                                    key={review.id} 
+                                    review={review}
+                                    onEdit={handleEditReview}
+                                    onDelete={handleDeleteReview}
+                                />
                             ))
                         ) : (
                             <p className="text-gray-500 col-span-2 text-center">Aún no hay reseñas para esta universidad.</p>
@@ -280,7 +378,18 @@ export default function University() {
                 </div>
                 {/* {message && <div className="text-center text-red-500 mb-4">{message}</div>} */}
                 <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-                    <ReviewForm onSubmit={handleSubmitReview} onCancel={handleCloseModal} />
+                    {isEditMode ? (
+                        <EditReviewForm 
+                            review={editingReview}
+                            onSubmit={handleUpdateReview}
+                            onCancel={handleCloseModal}
+                        />
+                    ) : (
+                        <ReviewForm 
+                            onSubmit={handleSubmitReview}
+                            onCancel={handleCloseModal}
+                        />
+                    )}
                 </Modal>
                 {fetchError && <p>ERROR</p>}
             </div>
