@@ -26,13 +26,13 @@ export default function Footer() {
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Plataforma</h3>
                         <ul className="space-y-2 text-sm">
                             <li>
-                                <a href="/" className="text-gray-600 hover:text-blue-600 transition-colors">Inicio</a>
+                                <Link to="/" className="text-gray-600 hover:text-blue-600 transition-colors">Inicio</Link>
                             </li>
                             <li>
-                                <a href="/miperfil" className="text-gray-600 hover:text-blue-600 transition-colors">Mi perfil</a>
+                                <Link to="/miperfil" className="text-gray-600 hover:text-blue-600 transition-colors">Mi perfil</Link>
                             </li>
                             <li>
-                                <a href="/universidades" className="text-gray-600 hover:text-blue-600 transition-colors">Explorar universidades</a>
+                                <Link to="/universidades" className="text-gray-600 hover:text-blue-600 transition-colors">Explorar universidades</Link>
                             </li>
                         </ul>
                     </div>
