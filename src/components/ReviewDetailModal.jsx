@@ -1,7 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { UserAuth } from '../context/AuthContext';
+import ConfirmModal from './ConfirmModal';
 
-export default function ReviewDetailModal({ review, isOpen, onClose }) {
+export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onDelete }) {
+    const { session } = UserAuth();
+    const user = session?.user;
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    
+    // Verificar si el review pertenece al usuario actual
+    const isOwner = user?.id === review.user_id;
+
+    // Mostrar "Anónimo" si el review es anónimo
+    const displayName = review.anonymous ? "Anónimo" : (review.profiles?.username ?? "Usuario");
+
     // Bloquear scroll del body cuando el modal está abierto
     useEffect(() => {
         if (isOpen) {
@@ -74,7 +86,7 @@ export default function ReviewDetailModal({ review, isOpen, onClose }) {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
                             <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.75rem' }}>
-                                Review de {review.profiles?.username ?? "Anónimo"}
+                                Review de {displayName}
                             </h2>
                             <p style={{ color: '#6b7280', marginBottom: '0.75rem', fontSize: '1.125rem' }}>
                                 Semestre: {review.semester}
@@ -88,22 +100,64 @@ export default function ReviewDetailModal({ review, isOpen, onClose }) {
                                 </div>
                             )}
                         </div>
-                        <button
-                            onClick={onClose}
-                            style={{
-                                color: '#6b7280',
-                                fontSize: '1.875rem',
-                                fontWeight: 'bold',
-                                padding: '0.5rem',
-                                cursor: 'pointer',
-                                border: 'none',
-                                background: 'none'
-                            }}
-                            onMouseEnter={(e) => e.target.style.color = '#374151'}
-                            onMouseLeave={(e) => e.target.style.color = '#6b7280'}
-                        >
-                            ×
-                        </button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            {/* Botones de acción solo para el dueño */}
+                            {isOwner && (
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <button
+                                        onClick={() => {
+                                            onEdit(review);
+                                            onClose();
+                                        }}
+                                        style={{
+                                            backgroundColor: '#3b82f6',
+                                            color: 'white',
+                                            padding: '0.5rem 1rem',
+                                            borderRadius: '0.375rem',
+                                            fontSize: '0.875rem',
+                                            fontWeight: '500',
+                                            border: 'none',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        ✏️ Editar
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setShowDeleteConfirm(true);
+                                        }}
+                                        style={{
+                                            backgroundColor: '#ef4444',
+                                            color: 'white',
+                                            padding: '0.5rem 1rem',
+                                            borderRadius: '0.375rem',
+                                            fontSize: '0.875rem',
+                                            fontWeight: '500',
+                                            border: 'none',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        🗑️ Eliminar
+                                    </button>
+                                </div>
+                            )}
+                            <button
+                                onClick={onClose}
+                                style={{
+                                    color: '#6b7280',
+                                    fontSize: '1.875rem',
+                                    fontWeight: 'bold',
+                                    padding: '0.5rem',
+                                    cursor: 'pointer',
+                                    border: 'none',
+                                    background: 'none'
+                                }}
+                                onMouseEnter={(e) => e.target.style.color = '#374151'}
+                                onMouseLeave={(e) => e.target.style.color = '#6b7280'}
+                            >
+                                ×
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -256,6 +310,27 @@ export default function ReviewDetailModal({ review, isOpen, onClose }) {
         </div>
     );
 
-    // Renderizar el modal fuera del contenedor padre usando Portal
-    return createPortal(modalContent, document.body);
+    const handleDeleteClick = () => {
+        setShowDeleteConfirm(true);
+    };
+
+    const handleDeleteConfirm = () => {
+        onDelete(review.id);
+        onClose();
+    };
+
+    return (
+        <>
+            {createPortal(modalContent, document.body)}
+            <ConfirmModal
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={handleDeleteConfirm}
+                title="Eliminar Review"
+                message="¿Estás seguro de que quieres eliminar este review? Esta acción no se puede deshacer."
+                confirmText="Eliminar"
+                cancelText="Cancelar"
+            />
+        </>
+    );
 }

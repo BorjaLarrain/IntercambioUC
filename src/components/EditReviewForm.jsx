@@ -1,18 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import RatingBar from "./RatingBar";
 
 const steps = [
   { key: "anonymous", label: "¿Quieres que tu reseña sea anónima?", helper: "Tu nombre no será visible si eliges que sea anónimo." },
   { key: "semester", label: "Semestre de intercambio", helper: "¿En qué semestre realizaste tu intercambio?" },
-  { key: "connectivity", label: "Movilidad 🚍✈️🚊", helper: "¿Era bueno el transporte público? ¿Qué tan fácil era moverse dentro y fuera de la ciudad? ¿Tenías un aeropuerto o estación de tren cerca? ¿La ciudad/campus era caminable?" },
-  { key: "cost_of_living", label: "Costo de vida 💰", helper: "¿Era caro vivir ahí? ¿Qué gastos eran los más altos? ¿Qué era más caro comparado con Chile? (alojamiento,comida, transporte, entretenimiento)"},
-  { key: "housing", label: "Alojamiento 🏠", helper: "¿Cómo era la calidad y precio del alojamiento? ¿Era difícil encontrar un lugar para vivir? ¿Estaba bien ubicado?" },
-  { key: "social_life", label: "Vida Social y Cultural 🎉🎭", helper: "¿Había actividades sociales/culturales para estudiantes? ¿Era fácil hacer amigos locales/internacionales?" },
-  { key: "academic_experience", label: "Experiencia Académica 📚", helper: "¿Era buena la oferta de ramos disponibles para alumnos de intercambio? ¿Qué ramos cursaste? ¿Fueron fáciles de convalidar? ¿Era buena la calidad de los cursos? ¿Eran fáciles o difíciles comparados con Chile?" },
-  { key: "general_description", label: "Descripción general 📝", helper: "Danos una breve descripción de tu experiencia. Si quieres puedes agregar cosas que no fueron cubiertas en los otros campos. Lo que respondas en este campo saldrá en el encabezado de tu reseña." }
+  { key: "connectivity", label: "Movilidad 🚍✈️🚗", helper: "¿Era bueno el transporte público? ¿Qué tan fácil era moverse dentro y fuera de la ciudad?" },
+  { key: "cost_of_living", label: "Costo de vida 💰", helper: "¿Era caro vivir ahí? ¿Qué gastos eran los más altos?" },
+  { key: "housing", label: "Alojamiento 🏠", helper: "¿Cómo era la calidad y precio del alojamiento?" },
+  { key: "social_life", label: "Vida Social y Cultural 🎉🎭", helper: "¿Había actividades para estudiantes?" },
+  { key: "academic_experience", label: "Experiencia Académica 📚", helper: "¿Era buena la oferta de ramos disponibles?" },
+  { key: "general_description", label: "Descripción general 📝", helper: "Danos una breve descripción de tu experiencia." }
 ];
 
-export default function ReviewForm({ onSubmit, onCancel }) {
+export default function EditReviewForm({ review, onSubmit, onCancel }) {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     anonymous: false,
@@ -26,6 +26,37 @@ export default function ReviewForm({ onSubmit, onCancel }) {
   });
 
   const current = steps[step];
+
+  // Cargar datos del review existente
+  useEffect(() => {
+    if (review) {
+      setForm({
+        anonymous: review.anonymous || false,
+        semester: review.semester || "",
+        connectivity: { 
+          rating: review.connectivity_rating || 0, 
+          comment: review.connectivity_description || "" 
+        },
+        housing: { 
+          rating: review.housing_rating || 0, 
+          comment: review.housing_description || "" 
+        },
+        cost_of_living: { 
+          rating: review.cost_of_living_rating || 0, 
+          comment: review.cost_of_living_description || "" 
+        },
+        social_life: { 
+          rating: review.social_life_rating || 0, 
+          comment: review.social_life_description || "" 
+        },
+        academic_experience: { 
+          rating: review.academic_experience_rating || 0, 
+          comment: review.academic_experience_description || "" 
+        },
+        general_description: review.general_description || "",
+      });
+    }
+  }, [review]);
 
   const handleRating = (value) => {
     setForm((prev) => ({
@@ -61,8 +92,11 @@ export default function ReviewForm({ onSubmit, onCancel }) {
       onSubmit={handleSubmit}
     >
       <h2 className="text-2xl font-bold mb-2 text-gray-800 text-center tracking-tight">
-        {current.label}
+        Editar Review
       </h2>
+      <h3 className="text-xl font-bold mb-2 text-gray-600 text-center tracking-tight">
+        {current.label}
+      </h3>
       <p className="mb-6 text-gray-500 text-center">{current.helper}</p>
 
       {current.key === "anonymous" ? (
@@ -120,6 +154,7 @@ export default function ReviewForm({ onSubmit, onCancel }) {
           />
         </>
       )}
+      
       <div className="flex justify-between w-full gap-2">
         {step > 0 && (
           <button
@@ -145,10 +180,11 @@ export default function ReviewForm({ onSubmit, onCancel }) {
             className="hover:cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors flex-1"
             disabled={form.general_description.trim() === ""}
           >
-            Enviar
+            Actualizar Review
           </button>
         )}
       </div>
+      
       <button
         type="button"
         className="hover:cursor-pointer mt-6 bg-blue-100 hover:bg-blue-200 text-blue-600 font-semibold py-2 px-4 rounded-lg shadow transition-colors w-full text-center"
@@ -158,4 +194,4 @@ export default function ReviewForm({ onSubmit, onCancel }) {
       </button>
     </form>
   );
-}
+} 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ReviewDetailModal from './ReviewDetailModal';
 
-export default function ReviewCard({ review }) {
+export default function ReviewCard({ review, onEdit, onDelete }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Usar el total_rating de la base de datos o calcularlo si no existe
@@ -18,13 +18,16 @@ export default function ReviewCard({ review }) {
         return ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
     })();
 
+    // Mostrar "Anónimo" si el review es anónimo
+    const displayName = review.anonymous ? "Anónimo" : (review.profiles?.username ?? "Usuario");
+
     return (
         <div className="w-full max-w-xl bg-gray-50 rounded-2xl p-6 shadow-lg hover:shadow-[0_4px_16px_rgba(50,130,246,0.15)] hover:-translate-y-1 transition-all">
             {/* Header con información básica */}
             <div className="mb-3">
                 <div className="flex justify-between items-start mb-2">
                     <span className="font-bold text-blue-500">
-                        {review.profiles?.username ?? "Anónimo"} | {review.semester}
+                        {displayName} | {review.semester}
                     </span>
                     {globalRating && (
                         <span className="text-yellow-500 text-lg font-semibold">
@@ -55,6 +58,8 @@ export default function ReviewCard({ review }) {
                 review={review}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                onEdit={onEdit}
+                onDelete={onDelete}
             />
         </div>
     );
