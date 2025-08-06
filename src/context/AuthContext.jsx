@@ -12,7 +12,7 @@ export const AuthContextProvider = ({ children }) => {
 
         // Extraer el nombre del usuario de Google
         const googleName = user.user_metadata.full_name || user.user_metadata.name;
-        
+
         if (!googleName) return;
 
         try {
@@ -51,7 +51,7 @@ export const AuthContextProvider = ({ children }) => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             // Se actualiza el estado de "session"
             setSession(session);
-            
+
             // Si hay sesión y es un usuario de Google, guardar el nombre
             if (session?.user && session.user.app_metadata?.provider === 'google') {
                 saveGoogleUsername(session.user);
@@ -63,7 +63,7 @@ export const AuthContextProvider = ({ children }) => {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
-            
+
             // Si hay sesión y es un usuario de Google, guardar el nombre
             if (session?.user && session.user.app_metadata?.provider === 'google') {
                 saveGoogleUsername(session.user);
@@ -74,10 +74,15 @@ export const AuthContextProvider = ({ children }) => {
     }, []);
 
     // Función para crear cuenta (SignUp) (notar que es pasada hacia el componente "SignUp.jsx")
-    const signUpNewUser = async (email, password) => {
+    const signUpNewUser = async (email, password, username) => {
         const { data, error } = await supabase.auth.signUp({
             email: email,
             password: password,
+            options: {
+                data: {
+                    username: username
+                }
+            }
         });
 
         if (error) {
