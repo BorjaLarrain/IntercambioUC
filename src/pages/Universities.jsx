@@ -29,7 +29,8 @@ export default function Universities() {
     const [filters, setFilters] = useState({
         continent: "",
         rating: "",
-        location: ""
+        location: "",
+        student_major: ""
     });
 
     // Estados para paginación
@@ -46,7 +47,10 @@ export default function Universities() {
             
             let queryBuilder = supabase
                 .from("universities")
-                .select("*");
+                .select(`
+                    *,
+                    reviews_count:reviews(count)
+                `);
 
             // Aplicar filtro de búsqueda por nombre
             if (searchTerm) {
@@ -66,6 +70,26 @@ export default function Universities() {
                 queryBuilder = queryBuilder.gte("global_rating", parseFloat(filters.rating));
             }
 
+            // Filtro por carrera universitaria - solo aplicar si hay filtro
+            if (filters.student_major) {
+                // Hacer una subconsulta para obtener universidades que tienen reseñas de esa carrera
+                const { data: universitiesWithMajor } = await supabase
+                    .from("reviews")
+                    .select("university_id")
+                    .eq("student_major", filters.student_major);
+                
+                if (universitiesWithMajor && universitiesWithMajor.length > 0) {
+                    const universityIds = universitiesWithMajor.map(r => r.university_id);
+                    queryBuilder = queryBuilder.in("id", universityIds);
+                } else {
+                    // Si no hay reseñas de esa carrera, no mostrar ninguna universidad
+                    setResults([]);
+                    setDisplayedResults([]);
+                    setLoading(false);
+                    return;
+                }
+            }
+
             const { data, error } = await queryBuilder;
 
             if (error) {
@@ -73,9 +97,31 @@ export default function Universities() {
                 setResults([]);
                 setDisplayedResults([]);
             } else {
-                setResults(data || []);
-                setDisplayedResults((data || []).slice(0, resultsPerPage));
-                console.log("Resultados encontrados:", data);
+                // Procesar los datos para extraer el conteo de reseñas
+                const processedData = data?.map(university => ({
+                    ...university,
+                    reviews_count: university.reviews_count?.[0]?.count || 0
+                })) || [];
+                
+                let finalData = processedData;
+                
+                // Ordenar automáticamente: universidades con reseñas primero (excepto si hay filtro de rating)
+                if (!filters.rating) {
+                    finalData = processedData.sort((a, b) => {
+                        const aHasReviews = (a.reviews_count || 0) > 0;
+                        const bHasReviews = (b.reviews_count || 0) > 0;
+                        
+                        if (aHasReviews && !bHasReviews) return -1;
+                        if (!aHasReviews && bHasReviews) return 1;
+                        
+                        // Si ambas tienen o no tienen reseñas, ordenar por rating descendente
+                        return (b.global_rating || 0) - (a.global_rating || 0);
+                    });
+                }
+                
+                setResults(finalData);
+                setDisplayedResults(finalData.slice(0, resultsPerPage));
+                console.log("Resultados encontrados:", finalData);
             }
             
             setLoading(false);
@@ -110,7 +156,8 @@ export default function Universities() {
         setFilters({
             continent: "",
             rating: "",
-            location: ""
+            location: "",
+            student_major: ""
         });
         setSearchTerm("");
     };

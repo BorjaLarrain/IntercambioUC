@@ -88,9 +88,16 @@ export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onD
                             <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.75rem' }}>
                                 Review de {displayName}
                             </h2>
-                            <p style={{ color: '#6b7280', marginBottom: '0.75rem', fontSize: '1.125rem' }}>
-                                Semestre: {review.semester}
-                            </p>
+                            <div style={{ marginBottom: '0.75rem' }}>
+                                <p style={{ color: '#6b7280', fontSize: '1.125rem', marginBottom: '0.25rem' }}>
+                                    Semestre: {review.semester}
+                                </p>
+                                {review.student_major && (
+                                    <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
+                                        🎓 Carrera: {review.student_major}
+                                    </p>
+                                )}
+                            </div>
                             {globalRating && (
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <span style={{ color: '#f59e0b', fontSize: '1.875rem', fontWeight: 'bold', marginRight: '0.75rem' }}>

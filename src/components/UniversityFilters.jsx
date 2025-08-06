@@ -1,4 +1,5 @@
 import React from "react";
+import CareerDropdown from "./CareerDropdown";
 
 export default function UniversityFilters({ filters, setFilters, onClearFilters }) {
     // Opciones para los filtros
@@ -34,7 +35,6 @@ export default function UniversityFilters({ filters, setFilters, onClearFilters 
         "Australia", "Nueva Zelanda"
     ];
 
-
     const ratingRanges = [
         { label: "Cualquier rating", value: "" },
         { label: "4.5 o más", value: "4.5" },
@@ -59,7 +59,7 @@ export default function UniversityFilters({ filters, setFilters, onClearFilters 
 
             <div className="block">
                 {/* Filtros principales */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     {/* Filtro por continente */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -158,6 +158,17 @@ export default function UniversityFilters({ filters, setFilters, onClearFilters 
                             ))}
                         </select>
                     </div>
+
+                    {/* Filtro por carrera universitaria */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Carrera universitaria 🎓
+                        </label>
+                        <CareerDropdown
+                            value={filters.student_major || ""}
+                            onChange={(value) => setFilters({ ...filters, student_major: value })}
+                        />
+                    </div>
                 </div>
 
                 {/* Filtros activos */}
@@ -180,6 +191,12 @@ export default function UniversityFilters({ filters, setFilters, onClearFilters 
                             {filters.rating && (
                                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                     Rating: {filters.rating}+
+                                </span>
+                            )}
+
+                            {filters.student_major && (
+                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    🎓 Carrera: {filters.student_major}
                                 </span>
                             )}
                         </div>

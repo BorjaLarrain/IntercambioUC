@@ -150,6 +150,7 @@ export default function University() {
             user_id: user.id,
             anonymous: form.anonymous || false,
             semester: form.semester,
+            student_major: form.student_major,
             connectivity_rating: form.connectivity.rating || 0,
             connectivity_description: form.connectivity.comment || "",
             housing_rating: form.housing.rating || 0,
@@ -234,6 +235,7 @@ export default function University() {
         const reviewData = {
             anonymous: form.anonymous || false,
             semester: form.semester,
+            student_major: form.student_major,
             connectivity_rating: form.connectivity.rating || 0,
             connectivity_description: form.connectivity.comment || "",
             housing_rating: form.housing.rating || 0,
@@ -302,6 +304,9 @@ export default function University() {
                     <h2 className="text-xl font-semibold text-gray-800 mb-2">Calificación global</h2>
                     <div className="flex items-center text-3xl font-bold text-yellow-500 mb-2">
                         ★ {calcularRatingGlobal() !== null ? calcularRatingGlobal().toFixed(1) : "Esta universidad aún no tiene una calificación"}
+                    </div>
+                    <div className="text-gray-600">
+                        ({university.review_count || 0} reseñas)
                     </div>
                 </div>
                 {/* Ratings for each category */}
