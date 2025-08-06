@@ -26,9 +26,16 @@ export default function ReviewCard({ review, onEdit, onDelete }) {
             {/* Header con información básica */}
             <div className="mb-3">
                 <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-blue-500">
-                        {displayName} | {review.semester}
-                    </span>
+                    <div className="flex flex-col">
+                        <span className="font-bold text-blue-500">
+                            {displayName} | {review.semester}
+                        </span>
+                        {review.student_major && (
+                            <span className="text-sm text-gray-600 mt-1">
+                                🎓 {review.student_major}
+                            </span>
+                        )}
+                    </div>
                     {globalRating && (
                         <span className="text-yellow-500 text-lg font-semibold">
                             ★ {globalRating.toFixed(1)}
