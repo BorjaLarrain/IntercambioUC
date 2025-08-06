@@ -1,11 +1,14 @@
 import React from "react";
 
 export default function UniversityStats({ results, filters }) {
+    // Filtrar universidades que tienen reseñas (rating > 0)
+    const universitiesWithReviews = results.filter(uni => uni.global_rating > 0);
+    
     // Calcular estadísticas
     const stats = {
         total: results.length,
-        averageRating: results.length > 0 
-            ? (results.reduce((sum, uni) => sum + (uni.global_rating || 0), 0) / results.length).toFixed(1)
+        averageRating: universitiesWithReviews.length > 0 
+            ? (universitiesWithReviews.reduce((sum, uni) => sum + uni.global_rating, 0) / universitiesWithReviews.length).toFixed(1)
             : 0,
         topRated: results.filter(uni => uni.global_rating >= 4.5).length,
         countries: new Set(results.map(uni => uni.location)).size,
