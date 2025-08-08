@@ -48,7 +48,7 @@ export default function University() {
             // para obtener el "username" del creador de dicha review
             const { data, error } = await supabase
                 .from('reviews')
-                .select('*, profiles:profiles!user_id(username)')
+                .select('*, profiles:profiles!user_id(username, share_email), users:user_id(email)')
                 .eq('university_id', Number(id));
 
             if (error) {
@@ -180,7 +180,7 @@ export default function University() {
             // Recarga los reviews
             const { data } = await supabase
                 .from('reviews')
-                .select('*, profiles:profiles!user_id(username)')
+                .select('*, profiles:profiles!user_id(username, share_email), users:user_id(email)')
                 .eq('university_id', Number(id));
             setReviews(data);
         }
@@ -202,7 +202,7 @@ export default function University() {
                 // Recargar reviews
                 const { data } = await supabase
                     .from('reviews')
-                    .select('*, profiles:profiles!user_id(username)')
+                    .select('*, profiles:profiles!user_id(username, share_email), users:user_id(email)')
                     .eq('university_id', Number(id));
                 setReviews(data);
             }
@@ -265,7 +265,7 @@ export default function University() {
                 // Recargar reviews
                 const { data } = await supabase
                     .from('reviews')
-                    .select('*, profiles:profiles!user_id(username)')
+                    .select('*, profiles:profiles!user_id(username, share_email), users:user_id(email)')
                     .eq('university_id', Number(id));
                 setReviews(data);
             }
