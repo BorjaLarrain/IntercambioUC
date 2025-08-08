@@ -1,14 +1,18 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
+import { UserAuth } from '../context/AuthContext';
 
 export default function CreateReviewInstructionsModal({ isOpen, onClose }) {
+    // Se extrae sesión
+    const { session } = UserAuth();
+
     // Bloquear scroll del body cuando el modal está abierto
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
         }
-        
+
         // Restaurar scroll cuando el modal se cierra o el componente se desmonta
         return () => {
             document.body.style.overflow = 'unset';
@@ -18,7 +22,7 @@ export default function CreateReviewInstructionsModal({ isOpen, onClose }) {
     if (!isOpen) return null;
 
     const modalContent = (
-        <div 
+        <div
             style={{
                 position: 'fixed',
                 top: 0,
@@ -34,7 +38,7 @@ export default function CreateReviewInstructionsModal({ isOpen, onClose }) {
                 padding: '1rem'
             }}
         >
-            <div 
+            <div
                 style={{
                     backgroundColor: 'white',
                     borderRadius: '1rem',
@@ -47,7 +51,7 @@ export default function CreateReviewInstructionsModal({ isOpen, onClose }) {
                 }}
             >
                 {/* Header */}
-                <div 
+                <div
                     style={{
                         position: 'sticky',
                         top: 0,
@@ -89,11 +93,11 @@ export default function CreateReviewInstructionsModal({ isOpen, onClose }) {
                 {/* Content */}
                 <div style={{ padding: '2rem' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                        
+
                         {/* Paso 1 */}
-                        <div style={{ 
-                            backgroundColor: '#eff6ff', 
-                            borderRadius: '0.75rem', 
+                        <div style={{
+                            backgroundColor: '#eff6ff',
+                            borderRadius: '0.75rem',
                             padding: '2rem',
                             border: '2px solid #dbeafe'
                         }}>
@@ -121,49 +125,51 @@ export default function CreateReviewInstructionsModal({ isOpen, onClose }) {
                                 Primero necesitas tener una cuenta para poder crear reseñas. <span className='font-bold'>Omite este paso si ya tienes una cuenta o estás logueado.</span>
                             </p>
                             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                                <Link
-                                    to="/signup"
-                                    onClick={onClose}
-                                    style={{
-                                        backgroundColor: '#3b82f6',
-                                        color: 'white',
-                                        padding: '0.75rem 1.5rem',
-                                        borderRadius: '0.5rem',
-                                        fontWeight: '600',
-                                        textDecoration: 'none',
-                                        display: 'inline-block',
-                                        fontSize: '1rem'
-                                    }}
-                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
-                                    onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
-                                >
-                                    📝 Registrarse
-                                </Link>
-                                <Link
-                                    to="/signin"
-                                    onClick={onClose}
-                                    style={{
-                                        backgroundColor: '#10b981',
-                                        color: 'white',
-                                        padding: '0.75rem 1.5rem',
-                                        borderRadius: '0.5rem',
-                                        fontWeight: '600',
-                                        textDecoration: 'none',
-                                        display: 'inline-block',
-                                        fontSize: '1rem'
-                                    }}
-                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#059669'}
-                                    onMouseLeave={(e) => e.target.style.backgroundColor = '#10b981'}
-                                >
-                                    🔑 Iniciar Sesión
-                                </Link>
+                                {session ? <></> : <>
+                                    <Link
+                                        to="/signup"
+                                        onClick={onClose}
+                                        style={{
+                                            backgroundColor: '#3b82f6',
+                                            color: 'white',
+                                            padding: '0.75rem 1.5rem',
+                                            borderRadius: '0.5rem',
+                                            fontWeight: '600',
+                                            textDecoration: 'none',
+                                            display: 'inline-block',
+                                            fontSize: '1rem'
+                                        }}
+                                        onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
+                                        onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                                    >
+                                        📝 Registrarse
+                                    </Link>
+
+                                    <Link
+                                        to="/signin"
+                                        onClick={onClose}
+                                        style={{
+                                            backgroundColor: '#10b981',
+                                            color: 'white',
+                                            padding: '0.75rem 1.5rem',
+                                            borderRadius: '0.5rem',
+                                            fontWeight: '600',
+                                            textDecoration: 'none',
+                                            display: 'inline-block',
+                                            fontSize: '1rem'
+                                        }}
+                                        onMouseEnter={(e) => e.target.style.backgroundColor = '#059669'}
+                                        onMouseLeave={(e) => e.target.style.backgroundColor = '#10b981'}
+                                    >
+                                        🔑 Iniciar Sesión
+                                    </Link></>}
                             </div>
                         </div>
 
                         {/* Paso 2 */}
-                        <div style={{ 
-                            backgroundColor: '#fef3c7', 
-                            borderRadius: '0.75rem', 
+                        <div style={{
+                            backgroundColor: '#fef3c7',
+                            borderRadius: '0.75rem',
                             padding: '2rem',
                             border: '2px solid #fde68a'
                         }}>
@@ -211,9 +217,9 @@ export default function CreateReviewInstructionsModal({ isOpen, onClose }) {
                         </div>
 
                         {/* Paso 3 */}
-                        <div style={{ 
-                            backgroundColor: '#ecfdf5', 
-                            borderRadius: '0.75rem', 
+                        <div style={{
+                            backgroundColor: '#ecfdf5',
+                            borderRadius: '0.75rem',
                             padding: '2rem',
                             border: '2px solid #a7f3d0'
                         }}>

@@ -31,9 +31,15 @@ export default function ReviewCard({ review, onEdit, onDelete }) {
                             {displayName} | {review.semester}
                         </span>
                         {review.student_major && (
-                            <span className="text-sm text-gray-600 mt-1">
+                            <div className="text-sm text-gray-600 mt-1">
                                 🎓 {review.student_major}
-                            </span>
+                            </div>
+                        )}
+                        {/* Mostrar email si el usuario lo permite y no es anónimo */}
+                        {!review.anonymous && review.profiles?.share_email && review.users?.email && (
+                            <div className="text-sm text-gray-600 mt-1">
+                                📧 {review.users.email}
+                            </div>
                         )}
                     </div>
                     {globalRating && (

@@ -10,6 +10,7 @@ export default function Profile() {
     // Estados para los campos del perfil
     const [username, setUsername] = useState("");
     const [phone, setPhone] = useState("");
+    const [shareEmail, setShareEmail] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
@@ -21,7 +22,7 @@ export default function Profile() {
             setLoading(true);
             const { data, error } = await supabase
                 .from("profiles")
-                .select("username, phone_number")
+                .select("username, phone_number, share_email")
                 .eq("id", session.user.id)
                 .single();
 
@@ -31,6 +32,7 @@ export default function Profile() {
             } else {
                 setUsername(data?.username || "");
                 setPhone(data?.phone_number || "");
+                setShareEmail(data?.share_email || false);
                 console.log(username)
                 console.log(phone)
             }
@@ -55,6 +57,7 @@ export default function Profile() {
             id: session.user.id,
             username: username || null,
             phone_number: phone || null,
+            share_email: shareEmail,
             updated_at: new Date(),
         };
 
@@ -96,10 +99,39 @@ export default function Profile() {
                             onChange={(e) => setPhone(e.target.value)}
                         />
                     </div>
+                    <div>
+                        <label className="block text-gray-700 font-semibold mb-3">
+                            ¿Mostrar mi correo electrónico en las reseñas que he realizado para que puedan contactarme?
+                        </label>
+                        <div className="flex space-x-3">
+                            <button
+                                type="button"
+                                onClick={() => setShareEmail(true)}
+                                className={`hover:cursor-pointer flex-1 py-3 px-4 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                                    shareEmail
+                                        ? 'bg-blue-500 border-blue-500 text-white shadow-md'
+                                        : 'bg-white border-gray-300 text-gray-600 hover:border-blue-300 hover:text-blue-600'
+                                }`}
+                            >
+                                Sí
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setShareEmail(false)}
+                                className={`hover:cursor-pointer flex-1 py-3 px-4 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                                    !shareEmail
+                                        ? 'bg-blue-500 border-blue-500 text-white shadow-md'
+                                        : 'bg-white border-gray-300 text-gray-600 hover:border-blue-300 hover:text-blue-600'
+                                }`}
+                            >
+                                No
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <button
                     type="submit"
-                    className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg shadow transition-colors"
+                    className="hover:cursor-pointer w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg shadow transition-colors"
                     disabled={loading}
                 >
                     {loading ? "Guardando..." : "Guardar cambios"}
