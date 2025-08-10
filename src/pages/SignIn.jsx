@@ -49,6 +49,7 @@ export default function SignIn() {
 
             if (result.success) {
                 navigate('/');
+                setLoading(false);
             }
         } catch (err) {
             setError("ocurrió un error");
@@ -104,7 +105,14 @@ export default function SignIn() {
                     Iniciar sesión con Google
                 </button>
 
-                {error && loading && <div className="text-red-600 font-semibold w-full mt-5 text-center">{error}</div>}
+                {error && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-4">
+                        <div className="flex items-center">
+                            <div className="text-red-600 mr-2">⚠️</div>
+                            <div className="text-red-600 font-semibold text-sm">{error}</div>
+                        </div>
+                    </div>
+                )}
             </form>
         </div>
     );

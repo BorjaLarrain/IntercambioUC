@@ -162,7 +162,7 @@ export default function UniversityFilters({ filters, setFilters, onClearFilters 
                     {/* Filtro por carrera universitaria */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Carrera universitaria 🎓
+                            Carrera del estudiante 🎓 <span className="text-xs text-gray-500">(filtra por la carrera de quien escribió la review)</span>
                         </label>
                         <CareerDropdown
                             value={filters.student_major || ""}
@@ -196,7 +196,7 @@ export default function UniversityFilters({ filters, setFilters, onClearFilters 
 
                             {filters.student_major && (
                                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                    🎓 Carrera: {filters.student_major}
+                                    🎓 Carrera del estudiante: {filters.student_major}
                                 </span>
                             )}
                         </div>
