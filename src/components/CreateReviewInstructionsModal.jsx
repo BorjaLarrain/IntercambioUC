@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
@@ -6,6 +6,9 @@ import { UserAuth } from '../context/AuthContext';
 export default function CreateReviewInstructionsModal({ isOpen, onClose }) {
     // Se extrae sesión
     const { session } = UserAuth();
+    
+    // Ref para el contenido del modal
+    const modalRef = useRef();
 
     // Bloquear scroll del body cuando el modal está abierto
     useEffect(() => {
@@ -19,10 +22,39 @@ export default function CreateReviewInstructionsModal({ isOpen, onClose }) {
         };
     }, [isOpen]);
 
+    // Manejador para la tecla Escape
+    useEffect(() => {
+        const handleEscape = (event) => {
+            if (event.key === 'Escape' && isOpen) {
+                // Remover el focus de cualquier elemento activo
+                if (document.activeElement) {
+                    document.activeElement.blur();
+                }
+                onClose();
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('keydown', handleEscape);
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+        };
+    }, [isOpen, onClose]);
+
+    // Manejador para clic fuera del modal
+    const handleBackdropClick = (event) => {
+        if (modalRef.current && !modalRef.current.contains(event.target)) {
+            onClose();
+        }
+    };
+
     if (!isOpen) return null;
 
     const modalContent = (
         <div
+            onClick={handleBackdropClick}
             style={{
                 position: 'fixed',
                 top: 0,
@@ -39,6 +71,7 @@ export default function CreateReviewInstructionsModal({ isOpen, onClose }) {
             }}
         >
             <div
+                ref={modalRef}
                 style={{
                     backgroundColor: 'white',
                     borderRadius: '1rem',
