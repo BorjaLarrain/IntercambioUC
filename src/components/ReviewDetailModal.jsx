@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { UserAuth } from '../context/AuthContext';
 import ConfirmModal from './ConfirmModal';
@@ -7,19 +7,63 @@ export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onD
     const { session } = UserAuth();
     const user = session?.user;
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Ref para el contenido del modal
+    const modalRef = useRef();
+
     // Verificar si el review pertenece al usuario actual
     const isOwner = user?.id === review.user_id;
 
     // Mostrar "Anónimo" si el review es anónimo
     const displayName = review.anonymous ? "Anónimo" : (review.profiles?.username ?? "Usuario");
 
+    // Detectar si es mobile
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    // Manejador para la tecla Escape
+    useEffect(() => {
+        const handleEscape = (event) => {
+            if (event.key === 'Escape' && isOpen) {
+                // Remover el focus de cualquier elemento activo
+                if (document.activeElement) {
+                    document.activeElement.blur();
+                }
+                onClose();
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('keydown', handleEscape);
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+        };
+    }, [isOpen, onClose]);
+
+    // Manejador para clic fuera del modal
+    const handleBackdropClick = (event) => {
+        if (modalRef.current && !modalRef.current.contains(event.target)) {
+            onClose();
+        }
+    };
+
     // Bloquear scroll del body cuando el modal está abierto
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
         }
-        
+
         // Restaurar scroll cuando el modal se cierra o el componente se desmonta
         return () => {
             document.body.style.overflow = 'unset';
@@ -37,13 +81,14 @@ export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onD
             review.social_life_rating,
             review.academic_experience_rating
         ].filter(rating => rating !== null && rating !== undefined);
-        
+
         if (ratings.length === 0) return null;
         return ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
     })();
 
     const modalContent = (
-        <div 
+        <div
+            onClick={handleBackdropClick}
             style={{
                 position: 'fixed',
                 top: 0,
@@ -59,7 +104,8 @@ export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onD
                 padding: '1rem'
             }}
         >
-            <div 
+            <div
+                ref={modalRef}
                 style={{
                     backgroundColor: 'white',
                     borderRadius: '1rem',
@@ -67,50 +113,82 @@ export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onD
                     width: '100%',
                     maxWidth: '72rem',
                     height: '95vh',
+                    maxHeight: '95vh',
                     overflowY: 'auto',
                     position: 'relative'
                 }}
             >
                 {/* Header */}
-                <div 
+                <div
                     style={{
                         position: 'sticky',
                         top: 0,
                         backgroundColor: 'white',
                         borderBottom: '1px solid #e5e7eb',
-                        padding: '2rem',
+                        padding: isMobile ? '1rem' : '2rem',
                         borderRadius: '1rem 1rem 0 0',
                         zIndex: 10
                     }}
                 >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
-                            <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.75rem' }}>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        gap: isMobile ? '1rem' : '0'
+                    }}>
+                        <div style={{
+                            ...(isMobile && { flex: 1, minWidth: 0 })
+                        }}>
+                            <h2 style={{
+                                fontSize: 'clamp(1.25rem, 4vw, 1.875rem)',
+                                fontWeight: 'bold',
+                                color: '#1f2937',
+                                marginBottom: '0.75rem',
+                                lineHeight: '1.2'
+                            }}>
                                 Review de {displayName}
                             </h2>
                             <div style={{ marginBottom: '0.75rem' }}>
-                                <p style={{ color: '#6b7280', fontSize: '1.125rem', marginBottom: '0.25rem' }}>
+                                <p style={{ color: '#6b7280', fontSize: 'clamp(0.875rem, 3vw, 1.125rem)', marginBottom: '0.25rem' }}>
                                     Semestre: {review.semester}
                                 </p>
                                 {review.student_major && (
-                                    <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
+                                    <p style={{ color: '#6b7280', fontSize: 'clamp(0.875rem, 3vw, 1.125rem)' }}>
                                         🎓 Carrera: {review.student_major}
                                     </p>
                                 )}
                             </div>
                             {globalRating && (
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    <span style={{ color: '#f59e0b', fontSize: '1.875rem', fontWeight: 'bold', marginRight: '0.75rem' }}>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    ...(isMobile && { flexWrap: 'wrap', gap: '0.5rem' })
+                                }}>
+                                    <span style={{
+                                        color: '#f59e0b',
+                                        fontSize: 'clamp(1.5rem, 5vw, 1.875rem)',
+                                        fontWeight: 'bold',
+                                        marginRight: isMobile ? '0' : '0.75rem'
+                                    }}>
                                         ★ {globalRating.toFixed(1)}
                                     </span>
-                                    <span style={{ color: '#6b7280', fontSize: '1.125rem' }}>Rating Global</span>
+                                    <span style={{ color: '#6b7280', fontSize: 'clamp(0.875rem, 3vw, 1.125rem)' }}>Rating Global</span>
                                 </div>
                             )}
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: isMobile ? '0.5rem' : '1rem',
+                            ...(isMobile && { flexShrink: 0 })
+                        }}>
                             {/* Botones de acción solo para el dueño */}
                             {isOwner && (
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <div style={{
+                                    display: 'flex',
+                                    gap: '0.5rem',
+                                    ...(isMobile && { flexDirection: 'column' })
+                                }}>
                                     <button
                                         onClick={() => {
                                             onEdit(review);
@@ -119,12 +197,14 @@ export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onD
                                         style={{
                                             backgroundColor: '#3b82f6',
                                             color: 'white',
-                                            padding: '0.5rem 1rem',
+                                            padding: isMobile ? '0.75rem 1rem' : '0.5rem 1rem',
                                             borderRadius: '0.375rem',
                                             fontSize: '0.875rem',
                                             fontWeight: '500',
                                             border: 'none',
-                                            cursor: 'pointer'
+                                            cursor: 'pointer',
+                                            minHeight: '44px',
+                                            ...(isMobile && { minWidth: '80px' })
                                         }}
                                     >
                                         ✏️ Editar
@@ -136,12 +216,14 @@ export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onD
                                         style={{
                                             backgroundColor: '#ef4444',
                                             color: 'white',
-                                            padding: '0.5rem 1rem',
+                                            padding: isMobile ? '0.75rem 1rem' : '0.5rem 1rem',
                                             borderRadius: '0.375rem',
                                             fontSize: '0.875rem',
                                             fontWeight: '500',
                                             border: 'none',
-                                            cursor: 'pointer'
+                                            cursor: 'pointer',
+                                            minHeight: '44px',
+                                            ...(isMobile && { minWidth: '80px' })
                                         }}
                                     >
                                         🗑️ Eliminar
@@ -152,12 +234,17 @@ export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onD
                                 onClick={onClose}
                                 style={{
                                     color: '#6b7280',
-                                    fontSize: '1.875rem',
+                                    fontSize: 'clamp(1.5rem, 5vw, 1.875rem)',
                                     fontWeight: 'bold',
                                     padding: '0.5rem',
                                     cursor: 'pointer',
                                     border: 'none',
-                                    background: 'none'
+                                    background: 'none',
+                                    minHeight: '44px',
+                                    minWidth: '44px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
                                 }}
                                 onMouseEnter={(e) => e.target.style.color = '#374151'}
                                 onMouseLeave={(e) => e.target.style.color = '#6b7280'}
@@ -169,35 +256,64 @@ export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onD
                 </div>
 
                 {/* Content */}
-                <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                <div style={{
+                    padding: isMobile ? '1rem' : '2rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: isMobile ? '1.5rem' : '2rem'
+                }}>
                     {/* Descripción General */}
-                    <div style={{ backgroundColor: '#eff6ff', borderRadius: '0.75rem', padding: '2rem' }}>
-                        <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1e40af', marginBottom: '1rem' }}>
+                    <div style={{
+                        backgroundColor: '#eff6ff',
+                        borderRadius: '0.75rem',
+                        padding: isMobile ? '1.5rem' : '2rem'
+                    }}>
+                        <h3 style={{ fontSize: 'clamp(1.125rem, 4vw, 1.25rem)', fontWeight: '600', color: '#1e40af', marginBottom: '1rem' }}>
                             📝 Descripción General
                         </h3>
-                        <p style={{ color: '#374151', lineHeight: '1.75', fontSize: '1.125rem' }}>
+                        <p style={{ color: '#374151', lineHeight: '1.75', fontSize: 'clamp(1rem, 3vw, 1.125rem)' }}>
                             {review.general_description || "Sin descripción general disponible."}
                         </p>
                     </div>
 
                     {/* Ratings por Categoría */}
-                    <div style={{ 
-                        display: 'grid', 
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
-                        gap: '2rem' 
+                    <div style={{
+                        display: isMobile ? 'flex' : 'grid',
+                        flexDirection: isMobile ? 'column' : 'unset',
+                        gridTemplateColumns: isMobile ? 'unset' : 'repeat(auto-fit, minmax(400px, 1fr))',
+                        gap: isMobile ? '1rem' : '2rem'
                     }}>
                         {review.connectivity_rating && (
-                            <div style={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '0.75rem', padding: '2rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                    <h4 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#2563eb', display: 'flex', alignItems: 'center' }}>
+                            <div style={{
+                                backgroundColor: 'white',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '0.75rem',
+                                padding: isMobile ? '1.5rem' : '2rem',
+                                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+                                ...(isMobile && { width: '100%' })
+                            }}>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    marginBottom: isMobile ? '1rem' : '1.5rem',
+                                    ...(isMobile && { flexWrap: 'wrap', gap: '0.5rem' })
+                                }}>
+                                    <h4 style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)', fontWeight: '600', color: '#2563eb', display: 'flex', alignItems: 'center' }}>
                                         🚇 Movilidad
                                     </h4>
-                                    <span style={{ color: '#f59e0b', fontSize: '1.5rem', fontWeight: 'bold' }}>
+                                    <span style={{ color: '#f59e0b', fontSize: 'clamp(1.25rem, 4vw, 1.5rem)', fontWeight: 'bold' }}>
                                         ★ {review.connectivity_rating}
                                     </span>
                                 </div>
                                 {review.connectivity_description && (
-                                    <p style={{ color: '#374151', lineHeight: '1.75', fontSize: '1rem' }}>
+                                    <p style={{
+                                        color: '#374151',
+                                        lineHeight: '1.75',
+                                        fontSize: 'clamp(0.875rem, 3vw, 1rem)',
+                                        wordWrap: 'break-word',
+                                        overflowWrap: 'break-word'
+                                    }}>
                                         {review.connectivity_description}
                                     </p>
                                 )}
@@ -205,17 +321,36 @@ export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onD
                         )}
 
                         {review.housing_rating && (
-                            <div style={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '0.75rem', padding: '2rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                    <h4 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#2563eb', display: 'flex', alignItems: 'center' }}>
+                            <div style={{
+                                backgroundColor: 'white',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '0.75rem',
+                                padding: isMobile ? '1.5rem' : '2rem',
+                                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+                                ...(isMobile && { width: '100%' })
+                            }}>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    marginBottom: isMobile ? '1rem' : '1.5rem',
+                                    ...(isMobile && { flexWrap: 'wrap', gap: '0.5rem' })
+                                }}>
+                                    <h4 style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)', fontWeight: '600', color: '#2563eb', display: 'flex', alignItems: 'center' }}>
                                         🏠 Alojamiento
                                     </h4>
-                                    <span style={{ color: '#f59e0b', fontSize: '1.5rem', fontWeight: 'bold' }}>
+                                    <span style={{ color: '#f59e0b', fontSize: 'clamp(1.25rem, 4vw, 1.5rem)', fontWeight: 'bold' }}>
                                         ★ {review.housing_rating}
                                     </span>
                                 </div>
                                 {review.housing_description && (
-                                    <p style={{ color: '#374151', lineHeight: '1.75', fontSize: '1rem' }}>
+                                    <p style={{
+                                        color: '#374151',
+                                        lineHeight: '1.75',
+                                        fontSize: 'clamp(0.875rem, 3vw, 1rem)',
+                                        wordWrap: 'break-word',
+                                        overflowWrap: 'break-word'
+                                    }}>
                                         {review.housing_description}
                                     </p>
                                 )}
@@ -223,17 +358,36 @@ export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onD
                         )}
 
                         {review.cost_of_living_rating && (
-                            <div style={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '0.75rem', padding: '2rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                    <h4 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#2563eb', display: 'flex', alignItems: 'center' }}>
+                            <div style={{
+                                backgroundColor: 'white',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '0.75rem',
+                                padding: isMobile ? '1.5rem' : '2rem',
+                                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+                                ...(isMobile && { width: '100%' })
+                            }}>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    marginBottom: isMobile ? '1rem' : '1.5rem',
+                                    ...(isMobile && { flexWrap: 'wrap', gap: '0.5rem' })
+                                }}>
+                                    <h4 style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)', fontWeight: '600', color: '#2563eb', display: 'flex', alignItems: 'center' }}>
                                         💰 Costo de Vida
                                     </h4>
-                                    <span style={{ color: '#f59e0b', fontSize: '1.5rem', fontWeight: 'bold' }}>
+                                    <span style={{ color: '#f59e0b', fontSize: 'clamp(1.25rem, 4vw, 1.5rem)', fontWeight: 'bold' }}>
                                         ★ {review.cost_of_living_rating}
                                     </span>
                                 </div>
                                 {review.cost_of_living_description && (
-                                    <p style={{ color: '#374151', lineHeight: '1.75', fontSize: '1rem' }}>
+                                    <p style={{
+                                        color: '#374151',
+                                        lineHeight: '1.75',
+                                        fontSize: 'clamp(0.875rem, 3vw, 1rem)',
+                                        wordWrap: 'break-word',
+                                        overflowWrap: 'break-word'
+                                    }}>
                                         {review.cost_of_living_description}
                                     </p>
                                 )}
@@ -241,17 +395,36 @@ export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onD
                         )}
 
                         {review.social_life_rating && (
-                            <div style={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '0.75rem', padding: '2rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                    <h4 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#2563eb', display: 'flex', alignItems: 'center' }}>
+                            <div style={{
+                                backgroundColor: 'white',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '0.75rem',
+                                padding: isMobile ? '1.5rem' : '2rem',
+                                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+                                ...(isMobile && { width: '100%' })
+                            }}>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    marginBottom: isMobile ? '1rem' : '1.5rem',
+                                    ...(isMobile && { flexWrap: 'wrap', gap: '0.5rem' })
+                                }}>
+                                    <h4 style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)', fontWeight: '600', color: '#2563eb', display: 'flex', alignItems: 'center' }}>
                                         🎉 🎭 Vida Social y Cultural
                                     </h4>
-                                    <span style={{ color: '#f59e0b', fontSize: '1.5rem', fontWeight: 'bold' }}>
+                                    <span style={{ color: '#f59e0b', fontSize: 'clamp(1.25rem, 4vw, 1.5rem)', fontWeight: 'bold' }}>
                                         ★ {review.social_life_rating}
                                     </span>
                                 </div>
                                 {review.social_life_description && (
-                                    <p style={{ color: '#374151', lineHeight: '1.75', fontSize: '1rem' }}>
+                                    <p style={{
+                                        color: '#374151',
+                                        lineHeight: '1.75',
+                                        fontSize: 'clamp(0.875rem, 3vw, 1rem)',
+                                        wordWrap: 'break-word',
+                                        overflowWrap: 'break-word'
+                                    }}>
                                         {review.social_life_description}
                                     </p>
                                 )}
@@ -259,24 +432,37 @@ export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onD
                         )}
 
                         {review.academic_experience_rating && (
-                            <div style={{ 
-                                backgroundColor: 'white', 
-                                border: '1px solid #e5e7eb', 
-                                borderRadius: '0.75rem', 
-                                padding: '2rem', 
+                            <div style={{
+                                backgroundColor: 'white',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '0.75rem',
+                                padding: isMobile ? '1.5rem' : '2rem',
                                 boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-                                gridColumn: '1 / -1'
+                                gridColumn: isMobile ? 'unset' : '1 / -1',
+                                ...(isMobile && { width: '100%' })
                             }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                    <h4 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#2563eb', display: 'flex', alignItems: 'center' }}>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    marginBottom: isMobile ? '1rem' : '1.5rem',
+                                    ...(isMobile && { flexWrap: 'wrap', gap: '0.5rem' })
+                                }}>
+                                    <h4 style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)', fontWeight: '600', color: '#2563eb', display: 'flex', alignItems: 'center' }}>
                                         📚 Experiencia Académica
                                     </h4>
-                                    <span style={{ color: '#f59e0b', fontSize: '1.5rem', fontWeight: 'bold' }}>
+                                    <span style={{ color: '#f59e0b', fontSize: 'clamp(1.25rem, 4vw, 1.5rem)', fontWeight: 'bold' }}>
                                         ★ {review.academic_experience_rating}
                                     </span>
                                 </div>
                                 {review.academic_experience_description && (
-                                    <p style={{ color: '#374151', lineHeight: '1.75', fontSize: '1rem' }}>
+                                    <p style={{
+                                        color: '#374151',
+                                        lineHeight: '1.75',
+                                        fontSize: 'clamp(0.875rem, 3vw, 1rem)',
+                                        wordWrap: 'break-word',
+                                        overflowWrap: 'break-word'
+                                    }}>
                                         {review.academic_experience_description}
                                     </p>
                                 )}
@@ -291,7 +477,7 @@ export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onD
                     bottom: 0,
                     backgroundColor: 'white',
                     borderTop: '1px solid #e5e7eb',
-                    padding: '2rem',
+                    padding: isMobile ? '1rem' : '2rem',
                     borderRadius: '0 0 1rem 1rem'
                 }}>
                     <button
@@ -305,7 +491,8 @@ export default function ReviewDetailModal({ review, isOpen, onClose, onEdit, onD
                             fontWeight: '600',
                             border: 'none',
                             cursor: 'pointer',
-                            fontSize: '1rem'
+                            fontSize: 'clamp(1rem, 3vw, 1.125rem)',
+                            minHeight: '48px'
                         }}
                         onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
                         onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
