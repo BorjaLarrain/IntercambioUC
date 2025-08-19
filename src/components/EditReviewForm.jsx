@@ -76,12 +76,24 @@ export default function EditReviewForm({ review, onSubmit, onCancel }) {
     }));
   };
 
-  const handleNext = () => setStep((s) => s + 1);
-  const handlePrev = () => setStep((s) => s - 1);
+  const handleNext = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setStep((s) => s + 1);
+  };
+
+  const handlePrev = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setStep((s) => s - 1);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(form);
+    // Solo enviar si estamos en el último paso Y la descripción general no está vacía
+    if (step === steps.length - 1 && form.general_description.trim() !== "") {
+      onSubmit(form);
+    }
   };
 
   const semesterOptions = [];
@@ -182,10 +194,17 @@ export default function EditReviewForm({ review, onSubmit, onCancel }) {
             type="button"
             className="hover:cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors flex-1"
             onClick={handleNext}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }}
             disabled={
               current.key !== "anonymous" && 
               current.key !== "semester" && 
               current.key !== "student_major" && 
+              current.key !== "general_description" &&
               form[current.key].rating === 0
             }
           >
