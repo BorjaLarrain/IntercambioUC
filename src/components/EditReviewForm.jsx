@@ -7,11 +7,11 @@ const steps = [
   { key: "semester", label: "Semestre de intercambio", helper: "¿En qué semestre realizaste tu intercambio?" },
   { key: "student_major", label: "Tu carrera universitaria 🎓", helper: "¿Qué carrera estudias en la UC? Puedes seleccionar 'Otra' si no está en la lista. O 'Prefiero no decirlo' si no quieres decirlo." },
   { key: "connectivity", label: "Movilidad 🚍✈️🚊", helper: "¿Era bueno el transporte público? ¿Qué tan fácil era moverse dentro y fuera de la ciudad? ¿Tenías un aeropuerto o estación de tren cerca? ¿La ciudad/campus era caminable? ¿La ciudad estaba bien ubicada dentro de la región/continente?" },
-  { key: "cost_of_living", label: "Costo de vida 💰", helper: "¿Era caro vivir ahí? ¿Qué gastos eran los más altos? ¿Qué era más caro comparado con Chile? (alojamiento, comida, transporte, entretenimiento) (Más estrellas = más barato)"},
-  { key: "housing", label: "Alojamiento 🏠", helper: "¿Cómo era la calidad y precio del alojamiento? ¿Era difícil encontrar un lugar para vivir? ¿Estaba bien ubicado?" },
+  { key: "cost_of_living", label: "Costo de vida ��", helper: "¿Era caro vivir ahí? ¿Qué gastos eran los más altos? ¿Qué era más caro comparado con Chile? (alojamiento, comida, transporte, entretenimiento) (Más estrellas = más barato)"},
+  { key: "housing", label: "Alojamiento ��", helper: "¿Cómo era la calidad y precio del alojamiento? ¿Era difícil encontrar un lugar para vivir? ¿Estaba bien ubicado?" },
   { key: "social_life", label: "Vida Social y Cultural 🎉🎭", helper: "¿Había actividades sociales/culturales para estudiantes? ¿Era fácil hacer amigos locales/internacionales?" },
   { key: "academic_experience", label: "Experiencia Académica 📚", helper: "¿Era buena la oferta de ramos disponibles para alumnos de intercambio? ¿Qué ramos cursaste? ¿Fueron fáciles de convalidar? ¿Era buena la calidad de los cursos? ¿Eran fáciles o difíciles comparados con Chile?" },
-  { key: "general_description", label: "Descripción general 📝", helper: "Danos una breve descripción de tu experiencia. Si quieres puedes agregar cosas que no fueron cubiertas en los otros campos. Lo que respondas en este campo saldrá en el encabezado de tu reseña." },
+  { key: "general_description", label: "Descripción general ��", helper: "Danos una breve descripción de tu experiencia. Si quieres puedes agregar cosas que no fueron cubiertas en los otros campos. Lo que respondas en este campo saldrá en el encabezado de tu reseña." },
   { key: "share_email", label: "¿Quieres compartir tu email? 📧", helper: "Si eliges compartir tu email, otros estudiantes podrán contactarte para hacer preguntas sobre tu experiencia. Solo será visible si tu reseña no es anónima." }
 ];
 
@@ -27,7 +27,7 @@ export default function EditReviewForm({ review, onSubmit, onCancel }) {
     social_life: { rating: 0, comment: "" },
     academic_experience: { rating: 0, comment: "" },
     general_description: "",
-    share_email: true, // ← Cambiar de false a true
+    share_email: true,
   });
 
   const current = steps[step];
@@ -84,6 +84,7 @@ export default function EditReviewForm({ review, onSubmit, onCancel }) {
     e.stopPropagation();
     setStep((s) => s + 1);
   };
+
   const handlePrev = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -92,7 +93,10 @@ export default function EditReviewForm({ review, onSubmit, onCancel }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(form);
+    // Solo enviar si estamos en el último paso Y la descripción general no está vacía
+    if (step === steps.length - 1 && form.general_description.trim() !== "") {
+      onSubmit(form);
+    }
   };
 
   const semesterOptions = [];
@@ -249,4 +253,4 @@ export default function EditReviewForm({ review, onSubmit, onCancel }) {
       </button>
     </form>
   );
-} 
+}
