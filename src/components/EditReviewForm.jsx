@@ -5,13 +5,14 @@ import CareerDropdown from "./CareerDropdown";
 const steps = [
   { key: "anonymous", label: "¿Quieres que tu reseña sea anónima?", helper: "Tu nombre no será visible si eliges que sea anónimo." },
   { key: "semester", label: "Semestre de intercambio", helper: "¿En qué semestre realizaste tu intercambio?" },
-  { key: "student_major", label: "Tu carrera universitaria 🎓", helper: "¿Qué carrera estudias en la UC?" },
-  { key: "connectivity", label: "Movilidad 🚍✈️🚗", helper: "¿Era bueno el transporte público? ¿Qué tan fácil era moverse dentro y fuera de la ciudad?" },
-  { key: "cost_of_living", label: "Costo de vida 💰", helper: "¿Era caro vivir ahí? ¿Qué gastos eran los más altos?" },
-  { key: "housing", label: "Alojamiento 🏠", helper: "¿Cómo era la calidad y precio del alojamiento?" },
-  { key: "social_life", label: "Vida Social y Cultural 🎉🎭", helper: "¿Había actividades para estudiantes?" },
-  { key: "academic_experience", label: "Experiencia Académica 📚", helper: "¿Era buena la oferta de ramos disponibles?" },
-  { key: "general_description", label: "Descripción general 📝", helper: "Danos una breve descripción de tu experiencia." }
+  { key: "student_major", label: "Tu carrera universitaria 🎓", helper: "¿Qué carrera estudias en la UC? Puedes seleccionar 'Otra' si no está en la lista. O 'Prefiero no decirlo' si no quieres decirlo." },
+  { key: "connectivity", label: "Movilidad 🚍✈️🚊", helper: "¿Era bueno el transporte público? ¿Qué tan fácil era moverse dentro y fuera de la ciudad? ¿Tenías un aeropuerto o estación de tren cerca? ¿La ciudad/campus era caminable? ¿La ciudad estaba bien ubicada dentro de la región/continente?" },
+  { key: "cost_of_living", label: "Costo de vida 💰", helper: "¿Era caro vivir ahí? ¿Qué gastos eran los más altos? ¿Qué era más caro comparado con Chile? (alojamiento, comida, transporte, entretenimiento) (Más estrellas = más barato)"},
+  { key: "housing", label: "Alojamiento 🏠", helper: "¿Cómo era la calidad y precio del alojamiento? ¿Era difícil encontrar un lugar para vivir? ¿Estaba bien ubicado?" },
+  { key: "social_life", label: "Vida Social y Cultural 🎉🎭", helper: "¿Había actividades sociales/culturales para estudiantes? ¿Era fácil hacer amigos locales/internacionales?" },
+  { key: "academic_experience", label: "Experiencia Académica 📚", helper: "¿Era buena la oferta de ramos disponibles para alumnos de intercambio? ¿Qué ramos cursaste? ¿Fueron fáciles de convalidar? ¿Era buena la calidad de los cursos? ¿Eran fáciles o difíciles comparados con Chile?" },
+  { key: "general_description", label: "Descripción general 📝", helper: "Danos una breve descripción de tu experiencia. Si quieres puedes agregar cosas que no fueron cubiertas en los otros campos. Lo que respondas en este campo saldrá en el encabezado de tu reseña." },
+  { key: "share_email", label: "¿Quieres compartir tu email? 📧", helper: "Si eliges compartir tu email, otros estudiantes podrán contactarte para hacer preguntas sobre tu experiencia. Solo será visible si tu reseña no es anónima." }
 ];
 
 export default function EditReviewForm({ review, onSubmit, onCancel }) {
@@ -26,6 +27,7 @@ export default function EditReviewForm({ review, onSubmit, onCancel }) {
     social_life: { rating: 0, comment: "" },
     academic_experience: { rating: 0, comment: "" },
     general_description: "",
+    share_email: true, // ← Cambiar de false a true
   });
 
   const current = steps[step];
@@ -58,6 +60,7 @@ export default function EditReviewForm({ review, onSubmit, onCancel }) {
           comment: review.academic_experience_description || "" 
         },
         general_description: review.general_description || "",
+        share_email: review.profiles?.share_email || false,
       });
     }
   }, [review]);
@@ -76,8 +79,16 @@ export default function EditReviewForm({ review, onSubmit, onCancel }) {
     }));
   };
 
-  const handleNext = () => setStep((s) => s + 1);
-  const handlePrev = () => setStep((s) => s - 1);
+  const handleNext = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setStep((s) => s + 1);
+  };
+  const handlePrev = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setStep((s) => s - 1);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -150,6 +161,25 @@ export default function EditReviewForm({ review, onSubmit, onCancel }) {
           onChange={e => setForm(prev => ({ ...prev, general_description: e.target.value }))}
           required
         />
+      ) : current.key === "share_email" ? (
+        <div className="w-full flex flex-col items-center mb-6">
+          <div className="flex gap-4">
+            <button
+              type="button"
+              className={`hover:cursor-pointer px-4 py-2 rounded-lg shadow transition-colors font-semibold ${form.share_email ? "bg-blue-500 hover:bg-blue-600 text-white" : "bg-blue-100 hover:bg-blue-200 text-blue-600"}`}
+              onClick={() => setForm(prev => ({ ...prev, share_email: true }))}
+            >
+              Sí, compartir mi email
+            </button>
+            <button
+              type="button"
+              className={`hover:cursor-pointer px-4 py-2 rounded-lg shadow transition-colors font-semibold ${!form.share_email ? "bg-blue-500 hover:bg-blue-600 text-white" : "bg-blue-100 hover:bg-blue-200 text-blue-600"}`}
+              onClick={() => setForm(prev => ({ ...prev, share_email: false }))}
+            >
+              No, no compartir
+            </button>
+          </div>
+        </div>
       ) : (
         <>
           <div className="mb-6 flex justify-center w-full">
@@ -182,10 +212,18 @@ export default function EditReviewForm({ review, onSubmit, onCancel }) {
             type="button"
             className="hover:cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors flex-1"
             onClick={handleNext}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }}
             disabled={
               current.key !== "anonymous" && 
               current.key !== "semester" && 
               current.key !== "student_major" && 
+              current.key !== "general_description" &&
+              current.key !== "share_email" &&
               form[current.key].rating === 0
             }
           >

@@ -48,7 +48,7 @@ export default function University() {
             // para obtener el "username" del creador de dicha review
             const { data, error } = await supabase
                 .from('reviews')
-                .select('*, profiles:profiles!user_id(username, share_email), users:user_id(email)')
+                .select('*, profiles:profiles!user_id(username, share_email, email), users:user_id(email)')
                 .eq('university_id', Number(id));
 
             if (error) {
@@ -165,6 +165,28 @@ export default function University() {
             total_rating: globalRating || 0,
         };
 
+        // Actualizar el email del usuario en la tabla profiles (no users)
+        if (form.email) {
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update({ email: form.email })
+                .eq('id', user.id);
+
+            if (profileError) {
+                console.error('Error updating profile email:', profileError);
+            }
+        }
+
+        // Solo actualizar share_email, no el email
+        const { error: profileError } = await supabase
+            .from('profiles')
+            .update({ share_email: form.share_email })
+            .eq('id', user.id);
+
+        if (profileError) {
+            console.error('Error updating profile:', profileError);
+        }
+
         console.log("Datos a insertar:", reviewData);
         const { error } = await supabase.from("reviews").insert([reviewData]);
         if (error) {
@@ -180,7 +202,7 @@ export default function University() {
             // Recarga los reviews
             const { data } = await supabase
                 .from('reviews')
-                .select('*, profiles:profiles!user_id(username, share_email), users:user_id(email)')
+                .select('*, profiles:profiles!user_id(username, share_email, email), users:user_id(email)')
                 .eq('university_id', Number(id));
             setReviews(data);
         }
@@ -202,7 +224,7 @@ export default function University() {
                 // Recargar reviews
                 const { data } = await supabase
                     .from('reviews')
-                    .select('*, profiles:profiles!user_id(username, share_email), users:user_id(email)')
+                    .select('*, profiles:profiles!user_id(username, share_email, email), users:user_id(email)')
                     .eq('university_id', Number(id));
                 setReviews(data);
             }
@@ -250,6 +272,28 @@ export default function University() {
             total_rating: globalRating || 0,
         };
 
+        // Actualizar el email del usuario en la tabla profiles (no users)
+        if (form.email) {
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update({ email: form.email })
+                .eq('id', user.id);
+
+            if (profileError) {
+                console.error('Error updating profile email:', profileError);
+            }
+        }
+
+        // Actualizar el perfil del usuario con share_email
+        const { error: profileError } = await supabase
+            .from('profiles')
+            .update({ share_email: form.share_email })
+            .eq('id', user.id);
+
+        if (profileError) {
+            console.error('Error updating profile:', profileError);
+        }
+
         try {
             const { error } = await supabase
                 .from('reviews')
@@ -265,7 +309,7 @@ export default function University() {
                 // Recargar reviews
                 const { data } = await supabase
                     .from('reviews')
-                    .select('*, profiles:profiles!user_id(username, share_email), users:user_id(email)')
+                    .select('*, profiles:profiles!user_id(username, share_email, email), users:user_id(email)')
                     .eq('university_id', Number(id));
                 setReviews(data);
             }
