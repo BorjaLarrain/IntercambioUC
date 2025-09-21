@@ -9,7 +9,7 @@ export default function Footer() {
         <footer className="bg-gradient-to-r from-blue-50 to-indigo-50 border-t border-blue-200 py-8 mt-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Contenido principal del footer */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-1 justify-items-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-1 justify-items-center">
 
                     {/* Sección: Acerca del proyecto */}
                     <div className="space-y-4">
@@ -40,6 +40,31 @@ export default function Footer() {
                                 <Link to="/universidades" className="text-gray-600 hover:text-blue-600 transition-colors">Explorar universidades</Link>
                             </li>
                         </ul>
+                    </div>
+
+                    {/* Sección: Contacto */}
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Contacto</h3>
+                        <div className="space-y-3">
+                            <div className="flex items-center space-x-3">
+                                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                <div>
+                                    <p className="text-sm text-gray-600">¿Dudas o feedback?</p>
+                                    <a
+                                        href="mailto:fblarrain@uc.cl,sebastian.passim@uc.cl?subject=IntercambioUC - Consulta"
+                                        className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                                    >
+                                        Contáctanos
+                                    </a>
+                                </div>
+                            </div>
+                            <div className="text-xs text-gray-500">
+                                <p>fblarrain@uc.cl</p>
+                                <p>sebastian.passim@uc.cl</p>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Sección: Fundadores */}

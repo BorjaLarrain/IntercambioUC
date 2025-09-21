@@ -11,7 +11,8 @@ const steps = [
   { key: "housing", label: "Alojamiento 🏠", helper: "¿Cómo era la calidad y precio del alojamiento? ¿Era difícil encontrar un lugar para vivir? ¿Estaba bien ubicado?" },
   { key: "social_life", label: "Vida Social y Cultural 🎉🎭", helper: "¿Había actividades sociales/culturales para estudiantes? ¿Era fácil hacer amigos locales/internacionales?" },
   { key: "academic_experience", label: "Experiencia Académica 📚", helper: "¿Era buena la oferta de ramos disponibles para alumnos de intercambio? ¿Qué ramos cursaste? ¿Fueron fáciles de convalidar? ¿Era buena la calidad de los cursos? ¿Eran fáciles o difíciles comparados con Chile?" },
-  { key: "general_description", label: "Descripción general 📝", helper: "Danos una breve descripción de tu experiencia. Si quieres puedes agregar cosas que no fueron cubiertas en los otros campos. Lo que respondas en este campo saldrá en el encabezado de tu reseña." }
+  { key: "general_description", label: "Descripción general 📝", helper: "Danos una breve descripción de tu experiencia. Si quieres puedes agregar cosas que no fueron cubiertas en los otros campos. Lo que respondas en este campo saldrá en el encabezado de tu reseña." },
+  { key: "share_email", label: "¿Quieres compartir tu email? 📧", helper: "Si eliges compartir tu email, otros estudiantes podrán contactarte para hacer preguntas sobre tu experiencia. Solo será visible si tu reseña no es anónima." }
 ];
 
 export default function ReviewForm({ onSubmit, onCancel }) {
@@ -26,6 +27,7 @@ export default function ReviewForm({ onSubmit, onCancel }) {
     social_life: { rating: 0, comment: "" },
     academic_experience: { rating: 0, comment: "" },
     general_description: "",
+    share_email: true, // ← Cambiar de false a true
   });
 
   const current = steps[step];
@@ -44,12 +46,24 @@ export default function ReviewForm({ onSubmit, onCancel }) {
     }));
   };
 
-  const handleNext = () => setStep((s) => s + 1);
-  const handlePrev = () => setStep((s) => s - 1);
+  const handleNext = (e) => {
+    e.preventDefault(); // Prevenir cualquier comportamiento por defecto
+    e.stopPropagation(); // Detener la propagación del evento
+    setStep((s) => s + 1);
+  };
+
+  const handlePrev = (e) => {
+    e.preventDefault(); // Prevenir cualquier comportamiento por defecto
+    e.stopPropagation(); // Detener la propagación del evento
+    setStep((s) => s - 1);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(form);
+    // Solo enviar si estamos en el último paso Y la descripción general no está vacía
+    if (step === steps.length - 1 && form.general_description.trim() !== "") {
+      onSubmit(form);
+    }
   };
 
   const semesterOptions = [];
@@ -84,6 +98,25 @@ export default function ReviewForm({ onSubmit, onCancel }) {
               onClick={() => setForm(prev => ({ ...prev, anonymous: false }))}
             >
               No
+            </button>
+          </div>
+        </div>
+      ) : current.key === "share_email" ? (
+        <div className="w-full flex flex-col items-center mb-6">
+          <div className="flex gap-4">
+            <button
+              type="button"
+              className={`hover:cursor-pointer px-4 py-2 rounded-lg shadow transition-colors font-semibold ${form.share_email ? "bg-blue-500 hover:bg-blue-600 text-white" : "bg-blue-100 hover:bg-blue-200 text-blue-600"}`}
+              onClick={() => setForm(prev => ({ ...prev, share_email: true }))}
+            >
+              Sí, compartir mi email
+            </button>
+            <button
+              type="button"
+              className={`hover:cursor-pointer px-4 py-2 rounded-lg shadow transition-colors font-semibold ${!form.share_email ? "bg-blue-500 hover:bg-blue-600 text-white" : "bg-blue-100 hover:bg-blue-200 text-blue-600"}`}
+              onClick={() => setForm(prev => ({ ...prev, share_email: false }))}
+            >
+              No, no compartir
             </button>
           </div>
         </div>
@@ -146,10 +179,18 @@ export default function ReviewForm({ onSubmit, onCancel }) {
             type="button"
             className="hover:cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors flex-1"
             onClick={handleNext}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }}
             disabled={
               current.key !== "anonymous" && 
               current.key !== "semester" && 
               current.key !== "student_major" && 
+              current.key !== "general_description" &&
+              current.key !== "share_email" &&
               form[current.key].rating === 0
             }
           >
